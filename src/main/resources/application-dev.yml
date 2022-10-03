@@ -4,16 +4,10 @@ token:
   expire-minutes: 30
   secret: dfjsfer2334re2342fdsx.
 
-swagger:
-  title: blog
-  version: 1.0
-  description: a blog backend build by spring security
-  license: MIT
-  author: bty
-  author-url: http://127.0.0.1
-  email: 2300175122@qq.com
+
 
 spring:
+
   mvc:
     # 必须添加否则swagger2会报错
     pathmatch:
@@ -45,4 +39,11 @@ spring:
             user-info-uri: https://gitee.com/api/v5/user
             # 注意，这里的user-name-attribute指的是每个平台用户名的key的名字，每个平台不一样的，gitee是name，所以这里写name
             user-name-attribute: name
+knife4j:
+  enable: true
+  production: false
+  basic:
+    enable: true
+    username: bty
+    password: 123456
 

@@ -32,7 +32,11 @@ swagger2 3.0.0版本和spring security有冲突
 swagger2
 3.0.0以下版本访问 /swagger-ui.html
 3.0.0版本访问 /swagger-ui/index.html
-
+加了knife4j，访问地址变为 http://ip:port/doc.html
 ------
 后记，因为现在springboot版本是2.7.4，直接运行swagger会报错，必须在yml里面配置 mvc.pathmatch.matching-strategy = ant_path_matcher
 然后现在用一个 springfox-boot-starter 依赖代理之前的springfox-swagger2和springfox-swagger-ui两个依赖，并且是3.0.0版本，可以正常用了。
+
+引用knife4j-spring-boot-starter改善swagger-ui并加入用户密码校验
+knife4j-spring-boot-starter前身是swagger-bootstrap-ui
+加了knife4j，访问地址变为 http://ip:port/doc.html

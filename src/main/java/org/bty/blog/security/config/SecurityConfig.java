@@ -46,8 +46,10 @@ public class SecurityConfig {
             "/webjars/**",
             // -- Swagger UI v3 (OpenAPI)
             "/v3/api-docs/**",
-            "/swagger-ui/**"
-            // other public endpoints of your API may be appended to this array
+            "/swagger-ui/**",
+       
+            // knife4j 访问的首页地址
+            "/doc.html"
     };
 
     private final LoginSuccessHandler loginSuccessHandler;
