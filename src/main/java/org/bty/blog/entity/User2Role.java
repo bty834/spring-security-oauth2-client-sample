@@ -1,5 +1,6 @@
 package org.bty.blog.entity;
 
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ApiModel(value = "用户角色对应关系")
 public class User2Role {
     private Integer id;
     private Integer userId;
