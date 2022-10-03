@@ -81,6 +81,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // 创建jwt
         String jwtToken = tokenService.initToken(token);
+
         response.setContentType(APPLICATION_JSON_UTF8_VALUE);
         response.getWriter().write(
                 JacksonUtil.getObjectMapper().writeValueAsString(

@@ -1,6 +1,8 @@
 package org.bty.blog.security.config;
 
 import lombok.RequiredArgsConstructor;
+import org.bty.blog.security.converter.BearAuthenticationConverter;
+import org.bty.blog.security.filter.BearAuthenticationFilter;
 import org.bty.blog.security.handler.LoginSuccessHandler;
 import org.bty.blog.security.handler.OAuth2LoginSuccessHandler;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -47,7 +50,7 @@ public class SecurityConfig {
             // -- Swagger UI v3 (OpenAPI)
             "/v3/api-docs/**",
             "/swagger-ui/**",
-       
+
             // knife4j 访问的首页地址
             "/doc.html"
     };
@@ -55,6 +58,7 @@ public class SecurityConfig {
     private final LoginSuccessHandler loginSuccessHandler;
     private final OAuth2LoginSuccessHandler giteeSuccessHandler;
 
+    private final BearAuthenticationFilter bearAuthenticationFilter;
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
@@ -78,6 +82,7 @@ public class SecurityConfig {
 
         http.oauth2Login().successHandler(giteeSuccessHandler);
 
+        http.addFilterBefore(bearAuthenticationFilter, BasicAuthenticationFilter.class);
 
         return http.build();
     }
