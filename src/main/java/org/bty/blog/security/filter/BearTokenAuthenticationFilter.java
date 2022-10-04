@@ -1,9 +1,7 @@
 package org.bty.blog.security.filter;
 
 import lombok.RequiredArgsConstructor;
-import org.bty.blog.security.converter.BearAuthenticationConverter;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.bty.blog.security.converter.BearTokenAuthenticationConverter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,17 +22,21 @@ import java.io.IOException;
  **/
 @Component
 @RequiredArgsConstructor
-public class BearAuthenticationFilter extends OncePerRequestFilter {
+public class BearTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    private final BearAuthenticationConverter bearAuthenticationConverter;
+    private final BearTokenAuthenticationConverter bearTokenAuthenticationConverter;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        if(request.getServletPath().startsWith("/login") || request.getServletPath().startsWith("/oauth2")){
+            filterChain.doFilter(request,response);
+            return;
+        }
 
         try {
-            Authentication authentication = this.bearAuthenticationConverter.convert(request);
+            Authentication authentication = this.bearTokenAuthenticationConverter.convert(request);
             if(authentication==null){
                 filterChain.doFilter(request,response);
             }
@@ -43,7 +45,7 @@ public class BearAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.clearContext();
             this.authenticationEntryPoint.commence(request, response, ex);
         }
-
+        filterChain.doFilter(request,response);
 
     }
 }

@@ -25,7 +25,7 @@ import java.util.Map;
 public class UserController {
 
 
-    @GetMapping
+    @GetMapping("/test")
     public ResponseEntity<BlogUser> getUser(){
         return ResponseEntity.ok(new BlogUser(1,"bty","123456"));
     }

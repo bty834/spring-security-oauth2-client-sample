@@ -19,7 +19,7 @@ import java.util.Map;
  * @since 1.8
  **/
 @RestController
-@RequestMapping
+@RequestMapping()
 public class HomeController {
 
 
@@ -30,7 +30,7 @@ public class HomeController {
      * @param oauth2User
      * @return
      */
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<Map<String, Object>> homeOauth(@RegisteredOAuth2AuthorizedClient("gitee") OAuth2AuthorizedClient authorizedClient,
                                               @AuthenticationPrincipal OAuth2User oauth2User){
         Map<String, Object> map = new HashMap<>();

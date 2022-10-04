@@ -1,11 +1,17 @@
 package org.bty.blog.security.converter;
 
 import lombok.RequiredArgsConstructor;
+
+import org.bty.blog.security.model.RedisOAuth2User;
+import org.bty.blog.security.model.RedisUserDetail;
 import org.bty.blog.service.TokenService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -13,6 +19,8 @@ import org.springframework.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+
 
 /**
  * @author bty
@@ -21,11 +29,9 @@ import java.nio.charset.StandardCharsets;
  **/
 @Component
 @RequiredArgsConstructor
-public class BearAuthenticationConverter implements AuthenticationConverter {
+public class BearTokenAuthenticationConverter implements AuthenticationConverter {
 
-    public static final String AUTHENTICATION_SCHEME_BEAR = "Bear";
-
-
+    public static final String AUTHENTICATION_SCHEME_BEAR = "Bearer";
     private Charset credentialsCharset = StandardCharsets.UTF_8;
 
     private final TokenService tokenService;
@@ -52,10 +58,23 @@ public class BearAuthenticationConverter implements AuthenticationConverter {
         if (header.equalsIgnoreCase(AUTHENTICATION_SCHEME_BEAR)) {
             throw new BadCredentialsException("Empty basic authentication token");
         }
-        String jwt = header.substring(5);
+        String jwt = header.substring(7);
+        Authentication authentication = null;
 
-        return (Authentication)tokenService.verifyToken(jwt);
+        Object o = tokenService.verifyToken(jwt);
 
+        if (o instanceof RedisUserDetail) {
 
+            RedisUserDetail userDetail = (RedisUserDetail) o;
+            authentication = new UsernamePasswordAuthenticationToken(userDetail.getUsername(),
+                    null,
+                    userDetail.getAuthorities());
+
+        } else if (o instanceof RedisOAuth2User) {
+            RedisOAuth2User oAuth2User = (RedisOAuth2User) o;
+            authentication = new OAuth2AuthenticationToken(oAuth2User, oAuth2User.getAuthorities(), oAuth2User.getRegistrationId());
+        }
+
+        return authentication;
     }
 }
