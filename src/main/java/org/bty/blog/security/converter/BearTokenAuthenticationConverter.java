@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.bty.blog.security.model.RedisOAuth2User;
 import org.bty.blog.security.model.RedisUserDetail;
 import org.bty.blog.service.TokenService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class BearTokenAuthenticationConverter implements AuthenticationConverter {
+    private static final Logger logger = LoggerFactory.getLogger(BearTokenAuthenticationConverter.class);
 
     public static final String AUTHENTICATION_SCHEME_BEAR = "Bearer";
     private Charset credentialsCharset = StandardCharsets.UTF_8;
@@ -49,13 +52,16 @@ public class BearTokenAuthenticationConverter implements AuthenticationConverter
 
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header == null) {
+            logger.info("header is null");
             return null;
         }
         header = header.trim();
         if (!StringUtils.startsWithIgnoreCase(header, AUTHENTICATION_SCHEME_BEAR)) {
+            logger.warn("header Authentication is not bearer token");
             return null;
         }
         if (header.equalsIgnoreCase(AUTHENTICATION_SCHEME_BEAR)) {
+            logger.error("Empty basic authentication token");
             throw new BadCredentialsException("Empty basic authentication token");
         }
         String jwt = header.substring(7);
@@ -74,7 +80,7 @@ public class BearTokenAuthenticationConverter implements AuthenticationConverter
             RedisOAuth2User oAuth2User = (RedisOAuth2User) o;
             authentication = new OAuth2AuthenticationToken(oAuth2User, oAuth2User.getAuthorities(), oAuth2User.getRegistrationId());
         }
-
+        logger.info("bearer token is authenticated , authentication is :{}",authentication);
         return authentication;
     }
 }

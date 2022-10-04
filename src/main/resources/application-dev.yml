@@ -7,7 +7,6 @@ token:
 
 
 spring:
-
   mvc:
     # 必须添加否则swagger2会报错
     pathmatch:
@@ -16,7 +15,6 @@ spring:
     port: 6379
     host: localhost
   security:
-
     oauth2:
       client:
         registration:
@@ -37,6 +35,7 @@ spring:
             user-info-uri: https://gitee.com/api/v5/user
             # 注意，这里的user-name-attribute指的是每个平台用户名的key的名字，每个平台不一样的，gitee是name，所以这里写name
             user-name-attribute: name
+# swagger-bootstrap-ui
 knife4j:
   enable: true
   production: false
@@ -44,4 +43,3 @@ knife4j:
     enable: true
     username: bty
     password: 123456
-

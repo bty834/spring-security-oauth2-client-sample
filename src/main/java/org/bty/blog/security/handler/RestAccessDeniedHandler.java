@@ -2,6 +2,8 @@ package org.bty.blog.security.handler;
 
 
 import org.bty.blog.util.JacksonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -22,8 +24,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  **/
 @Component
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
+    private static final Logger logger = LoggerFactory.getLogger(RestAccessDeniedHandler.class);
+
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
+        logger.error(accessDeniedException.getMessage());
         response.setContentType(APPLICATION_JSON_UTF8_VALUE);
         response.getWriter().write(JacksonUtil.getObjectMapper().writeValueAsString(ResponseEntity.status(SC_FORBIDDEN).body(accessDeniedException.getMessage())));
     }

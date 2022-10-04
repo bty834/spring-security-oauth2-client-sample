@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-
-
     @Override
     public BlogUser getUserByUsername(String username) {
 

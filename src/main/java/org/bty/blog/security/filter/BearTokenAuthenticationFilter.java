@@ -2,6 +2,8 @@ package org.bty.blog.security.filter;
 
 import lombok.RequiredArgsConstructor;
 import org.bty.blog.security.converter.BearTokenAuthenticationConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +25,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class BearTokenAuthenticationFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(BearTokenAuthenticationFilter.class);
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
@@ -30,7 +33,9 @@ public class BearTokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         if(request.getServletPath().startsWith("/login") || request.getServletPath().startsWith("/oauth2")){
+            logger.info("skip token authentication for path {}",request.getServletPath());
             filterChain.doFilter(request,response);
             return;
         }
@@ -40,8 +45,10 @@ public class BearTokenAuthenticationFilter extends OncePerRequestFilter {
             if(authentication==null){
                 filterChain.doFilter(request,response);
             }
+            logger.info("bearer token authenticated successfully");
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (AuthenticationException ex) {
+            logger.error("bearer token authenticated failed for {}",ex.getMessage());
             SecurityContextHolder.clearContext();
             this.authenticationEntryPoint.commence(request, response, ex);
         }

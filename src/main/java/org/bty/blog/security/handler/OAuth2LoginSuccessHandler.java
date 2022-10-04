@@ -7,6 +7,8 @@ import org.bty.blog.security.model.RedisOAuth2User;
 import org.bty.blog.service.TokenService;
 
 import org.bty.blog.util.JacksonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -33,6 +35,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 
+    private static final Logger logger = LoggerFactory.getLogger(OAuth2LoginSuccessHandler.class);
 
     private final TokenService tokenService;
 
@@ -58,6 +61,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         RedisOAuth2User redisOAuth2User = new RedisOAuth2User(oAuth2User, token.getAuthorizedClientRegistrationId());
         // 创建jwt
         String jwtToken = tokenService.initToken(redisOAuth2User);
+        logger.info("jwt {} for oauth2.0 login user {}",jwtToken,oAuth2User);
 
         response.setContentType(APPLICATION_JSON_UTF8_VALUE);
         response.getWriter().write(
