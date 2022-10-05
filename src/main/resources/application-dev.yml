@@ -18,6 +18,7 @@ spring:
     oauth2:
       client:
         registration:
+          # google facebook github的provider默认提供
           gitee:
             provider: gitee
             authorization-grant-type: authorization_code

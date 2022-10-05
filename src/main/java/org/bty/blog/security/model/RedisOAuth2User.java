@@ -3,6 +3,7 @@ package org.bty.blog.security.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -33,6 +34,9 @@ public class RedisOAuth2User implements OAuth2User, Serializable {
         this.permissions = collection.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
         this.registrationId = registrationId;
     }
+//    public RedisOAuth2User(OidcUser oidcUser,String registrationId){
+//
+//    }
 
     public String getUsername() {
         return username;

@@ -44,6 +44,7 @@ public class BearTokenAuthenticationFilter extends OncePerRequestFilter {
             Authentication authentication = this.bearTokenAuthenticationConverter.convert(request);
             if(authentication==null){
                 filterChain.doFilter(request,response);
+                return;
             }
             logger.info("bearer token authenticated successfully");
             SecurityContextHolder.getContext().setAuthentication(authentication);

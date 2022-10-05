@@ -52,7 +52,7 @@ public class BearTokenAuthenticationConverter implements AuthenticationConverter
 
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header == null) {
-            logger.info("header is null");
+            logger.info("header Authorization is null");
             return null;
         }
         header = header.trim();
