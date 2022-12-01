@@ -18,7 +18,15 @@ spring:
     oauth2:
       client:
         registration:
-          # google facebook github的provider默认提供
+          # google facebook github okta的provider默认提供 org.springframework.security.config.oauth2.client.CommonOAuth2Provider
+          google:
+            authorization-grant-type: authorization_code
+            scope:
+              - openid
+              - profile
+            client-id: 1002538069997-86b2snre376ljmtt2efcgntai9pf3pkk.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
           gitee:
             provider: gitee
             authorization-grant-type: authorization_code

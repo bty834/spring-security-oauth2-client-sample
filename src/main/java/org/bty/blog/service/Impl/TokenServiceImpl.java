@@ -47,8 +47,6 @@ public class TokenServiceImpl implements TokenService {
     private final RoleService roleService;
 
     private String getTokenRedisKey(String uuid) {
-
-
         return "LOGIN" + ":" + uuid;
     }
 

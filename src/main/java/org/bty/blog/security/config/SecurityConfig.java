@@ -58,6 +58,13 @@ public class SecurityConfig {
     private final BearTokenAuthenticationFilter bearAuthenticationFilter;
 
     private final RestAccessDeniedHandler restAccessDeniedHandler;
+
+    /**
+     * 注意，在
+     * @return {@link SecurityConfig#securityFilterChain(HttpSecurity http)}
+     * 以上的方法中必须注明 {@code http.cors()}
+     *
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
@@ -72,6 +79,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
+        // 必须显式注明，配合CorsConfigurationSource的Bean，不然即使在web里面配置了跨域，security这里依然会cors error
+        http.cors();
         http.authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated();
