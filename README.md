@@ -2,8 +2,8 @@
 
 Spring Security 前后端分离Oauth2.0
 
-![](./docs/images/Oauth2前后端分离.png)
-![](./docs/images/details.png)
+![](docs/images/Oauth2前后端分离.png)
+![](docs/images/details.png)
 
 当要使用oauth2.0第三方登录时，uri默认的pattern为 `/oauth2/authorization/{registration_id}`，例如：
 我这里用gitee登录，那么后台接口为 `http://localhost:8080/oauth2/authorization/gitee` ，
