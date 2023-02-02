@@ -24,5 +24,4 @@ public class BlogUser {
     private String username;
     @JsonIgnore
     private transient String password;
-
 }
