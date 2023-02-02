@@ -94,8 +94,6 @@ public class SecurityConfig {
         http.exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
         http.addFilterBefore(bearAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http.addFilterAt(,ExceptionTranslationFilter.class);
-
         return http.build();
     }
 
