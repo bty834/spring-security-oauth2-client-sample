@@ -25,8 +25,12 @@ import java.util.Map;
 public class UserController {
 
 
-    @GetMapping("/test")
-    public ResponseEntity<BlogUser> getUser(){
-        return ResponseEntity.ok(new BlogUser(1,"bty","123456"));
-    }
+//    @GetMapping("/gitee")
+//    public ResponseEntity<Map<String, Object>> gitee( @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
+//                        @AuthenticationPrincipal OAuth2User oauth2User) {
+//        HashMap<String, Object> body = new HashMap<>();
+//        body.put("authorizedClient",authorizedClient);
+//        body.put("oauth2User",oauth2User);
+//        return ResponseEntity.ok(body);
+//    }
 }

@@ -18,9 +18,11 @@ spring:
     oauth2:
       client:
         registration:
-          # google facebook github okta的provider默认提供 org.springframework.security.config.oauth2.client.CommonOAuth2Provider
+          # google facebook github okta的provider默认提供
+          # 参见 org.springframework.security.config.oauth2.client.CommonOAuth2Provider
           google:
             authorization-grant-type: authorization_code
+
             scope:
               - openid
               - profile
@@ -32,9 +34,12 @@ spring:
             authorization-grant-type: authorization_code
             scope:
               - user_info
+              - emails
             client-id: 6daaa0856139bddf4aed00896ba6a62be8df4994401e95a2de2f9563f9c1062b
-            client-secret: e88ca1d2519ecd39c263cc10f089e65d86712d7cfce9657249495529231014fb
-            # 默认pattern /login/oauth2/code/{registration_id}
+            client-secret: cfaae87e9b239858aba809f3584973eb81bd383c5814a3fb899a9caf065fdf81
+
+            # 这儿是把code传到前端，前端再把code和state参数给后端
+            # 这里填写的是前端的地址，后端Spring Security接受code默认pattern /login/oauth2/code/{registration_id}
             redirect-uri: http://localhost:8080/login/oauth2/code/gitee
             client-name: gitee
         provider:

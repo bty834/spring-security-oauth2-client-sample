@@ -112,8 +112,31 @@ public class SecurityConfig {
                 .failureHandler(loginFailureHandler);
 //                        .securityContextRepository()  // pass
 
+
+        // OAuth2AuthorizationRequestRedirectFilter:
+        // 根据路径匹配，默认 /oauth2/authorization/{registration_id},如果匹配上，表示开始第三方登录
+        // 即，这个filter是用来获取authorization_code的。
+        // authorization_code会返回给前端，用户同意后，前端将code返回给后端
+        // 后端地址为redirect_url，须在第三方应用配置，也要再本应用配置，两个要相同
+        // redirect_url 默认格式为 /login/oauth2/code/{registration_id}?code=code&state=state
+
+        // OAuth2LoginAuthenticationFilter:
+        // 包含两部分：1. 拿着authorization_code去第三方授权服务器换取 accessToken  2. 拿着 accessToken去第三方资源服务器换取资源信息 (底层使用restTemplate)
+        // OAuth2LoginAuthenticationFilter 通过 OAuth2LoginAuthenticationProvider 执行 操作
+        // OAuth2LoginAuthenticationProvider 中有个 OAuth2AuthorizationCodeAuthenticationProvider ，后者专门用于 code换取accessToken操作
+        // OAuth2LoginAuthenticationProvider在OAuth2AuthorizationCodeAuthenticationProvider 获取到accessToken基础上执行 accessToken换取资源信息操作
         http.oauth2Login()
                 .successHandler(giteeSuccessHandler).failureHandler(loginFailureHandler);
+//                // 获取authorization 的 url
+//                .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig.baseUri("url"))
+//                // 授权服务器 返回authorization_code的回调地址
+//                .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig.baseUri("url"))
+//                // authorization_code 交换accessToken的 url
+//                .tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient())
+//                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService());
+
+
+
         http.exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
 
 
