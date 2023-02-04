@@ -51,24 +51,25 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
      */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
-        OAuth2User oAuth2User = token.getPrincipal();
 
-        // 异步执行
-        tokenService.completeUserInfo(token,oAuth2User);
+                OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
+                OAuth2User oAuth2User = token.getPrincipal();
+
+                // async
+                tokenService.completeUserInfo(token,oAuth2User);
 
 
-        RedisOAuth2User redisOAuth2User = new RedisOAuth2User(oAuth2User, token.getAuthorizedClientRegistrationId());
-        // 创建jwt
-        String jwtToken = tokenService.initToken(redisOAuth2User);
-        logger.info("jwt {} for oauth2.0 login user {}",jwtToken,oAuth2User);
+                RedisOAuth2User redisOAuth2User = new RedisOAuth2User(oAuth2User, token.getAuthorizedClientRegistrationId());
+                // store session and generate jwt
+                String jwtToken = tokenService.initToken(redisOAuth2User);
+                logger.info("jwt {} for oauth2.0 login user {}",jwtToken,oAuth2User);
 
-        response.setContentType(APPLICATION_JSON_UTF8_VALUE);
-        response.getWriter().write(
-                JacksonUtil.getObjectMapper().writeValueAsString(
-                        ResponseEntity.ok(Collections.singletonMap("token", jwtToken))
-                )
-        );
+                response.setContentType(APPLICATION_JSON_UTF8_VALUE);
+                response.getWriter().write(
+                        JacksonUtil.getObjectMapper().writeValueAsString(
+                                ResponseEntity.ok(Collections.singletonMap("token", jwtToken))
+                        )
+                );
 
     }
 }

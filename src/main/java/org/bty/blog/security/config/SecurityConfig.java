@@ -2,9 +2,7 @@ package org.bty.blog.security.config;
 
 import lombok.RequiredArgsConstructor;
 import org.bty.blog.security.filter.BearTokenAuthenticationFilter;
-import org.bty.blog.security.handler.LoginSuccessHandler;
-import org.bty.blog.security.handler.OAuth2LoginSuccessHandler;
-import org.bty.blog.security.handler.RestAccessDeniedHandler;
+import org.bty.blog.security.handler.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -55,8 +53,10 @@ public class SecurityConfig {
     };
 
     private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginFailureHandler loginFailureHandler;
     private final OAuth2LoginSuccessHandler giteeSuccessHandler;
 
+    private final CustomSessionAuthenticationStrategy customSessionAuthenticationStrategy;
     private final BearTokenAuthenticationFilter bearAuthenticationFilter;
 
     private final RestAccessDeniedHandler restAccessDeniedHandler;
@@ -80,6 +80,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+
         http.csrf().disable();
         // 必须显式注明，配合CorsConfigurationSource的Bean，不然即使在web里面配置了跨域，security这里依然会cors error
         http.cors();
@@ -87,20 +89,47 @@ public class SecurityConfig {
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated();
 
-        http.formLogin().successHandler(loginSuccessHandler);
+        // 设置登录成功后session处理, 认证成功后
+        // SessionAuthenticationStrategy的最早执行，详见AbstractAuthenticationProcessingFilter
+        // 执行顺序：
+        // 1. SessionAuthenticationStrategy#onAuthentication
+        // 2. SecurityContextHolder#setContext
+        // 3. SecurityContextRepository#saveContext
+        // 4. RememberMeServices#loginSuccess
+        // 5. ApplicationEventPublisher#publishEvent
+        // 6. AuthenticationSuccessHandler#onAuthenticationSuccess
+        http.sessionManagement().sessionAuthenticationStrategy(customSessionAuthenticationStrategy);
 
-        http.oauth2Login().successHandler(giteeSuccessHandler);
+        // 前后端不分离，可指定html返回。该项未测试
+        // http.formLogin().loginPage("login").loginProcessingUrl("/hello/login");
 
+        // 前后端分离下username/password登录
+        http.formLogin()
+                .usernameParameter("userId")
+                .passwordParameter("password")
+                .loginProcessingUrl("/hello/login")
+                .successHandler(loginSuccessHandler)
+                .failureHandler(loginFailureHandler);
+//                        .securityContextRepository()  // pass
+
+        http.oauth2Login()
+                .successHandler(giteeSuccessHandler).failureHandler(loginFailureHandler);
         http.exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
+
+
         http.addFilterBefore(bearAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    /**
+     * 对所有SecurityFilterChain做处理
+     * @return
+     */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         // 仅仅作为演示
-        return (web) -> web.ignoring().antMatchers("/ignore1", "/ignore2");
+        return (web) -> web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
     @Bean

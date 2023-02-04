@@ -26,7 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  * @date 2022/10/2
  * @since 1.8
  *
- * 普通用户名密码登录成功时的处理
+ * 普通用户名密码登录成功时的处理，记录登录状态并返回jwt
  **/
 @Component
 @RequiredArgsConstructor
@@ -45,22 +45,19 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
      */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+            UserDetails user = (UserDetails)authentication.getPrincipal();
 
-        UserDetails user = (UserDetails)authentication.getPrincipal();
+            RedisUserDetail redisUserDetail = new RedisUserDetail(user);
+            String jwtToken = tokenService.initToken(redisUserDetail);
 
-        RedisUserDetail redisUserDetail = new RedisUserDetail(user);
-        String jwtToken = tokenService.initToken(redisUserDetail);
+            logger.info("jwt {} for username-password login user {}",jwtToken,user);
 
-        logger.info("jwt {} for username-password login user {}",jwtToken,user);
-
-        response.setContentType(APPLICATION_JSON_UTF8_VALUE);
-        response.getWriter().write(
-                JacksonUtil.getObjectMapper().writeValueAsString(
-                        ResponseEntity.ok(Collections.singletonMap("token", jwtToken))
-                )
-        );
+            response.setContentType(APPLICATION_JSON_UTF8_VALUE);
+            response.getWriter().write(
+                    JacksonUtil.getObjectMapper().writeValueAsString(
+                            ResponseEntity.ok(Collections.singletonMap("token", jwtToken))
+                    )
+            );
     }
-
-
 
 }
