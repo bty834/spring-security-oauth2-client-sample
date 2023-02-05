@@ -48,6 +48,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             UserDetails user = (UserDetails)authentication.getPrincipal();
 
             RedisUserDetail redisUserDetail = new RedisUserDetail(user);
+            // 关于登录信息存储，可以在SecurityContextRepository中完成
             String jwtToken = tokenService.initToken(redisUserDetail);
 
             logger.info("jwt {} for username-password login user {}",jwtToken,user);

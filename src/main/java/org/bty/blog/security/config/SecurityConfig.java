@@ -103,6 +103,8 @@ public class SecurityConfig {
         // 6. AuthenticationSuccessHandler#onAuthenticationSuccess
         http.sessionManagement().sessionAuthenticationStrategy(customSessionAuthenticationStrategy);
 
+        // TODO http.securityContext().securityContextRepository(...);
+
         // 前后端不分离，可指定html返回。该项未测试
         // http.formLogin().loginPage("login").loginProcessingUrl("/hello/login");
 
@@ -132,19 +134,15 @@ public class SecurityConfig {
         http.oauth2Login()
                 .successHandler(giteeSuccessHandler)
                 .failureHandler(loginFailureHandler)
-
+// TODO
 //                // 开始认证访问的地址，获取authorization 的 url，一般通过yaml配置
 //                .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig.baseUri("url"))
-
 //                // 授权服务器 返回authorization_code的回调地址一般通过yaml配置
 //                .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig.baseUri("url"))
-
 //                // authorization_code 交换accessToken的 url ,一般通过yaml配置
 //                .tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient())
-
 //                // 获取用户授权信息，一般通过yaml配置
 //                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService())
-
 //                // 针对认证成功的用户，调用OAuth2AuthorizedClientRepository的
 //                // 默认实现类AuthenticatedPrincipalOAuth2AuthorizedClientRepository中的
 //                // OAuth2AuthorizedClientService (默认Inmemory)存储
@@ -153,6 +151,16 @@ public class SecurityConfig {
 //                .authorizedClientRepository(...)
                   .authorizedClientService(daoOAuth2AuthorizedClientService);
 
+// TODO
+//        http
+//              .logout(logout -> logout
+//                        .logoutUrl("/my/logout")
+//                        .logoutSuccessUrl("/my/index")
+//                        .logoutSuccessHandler(logoutSuccessHandler)
+//                        .invalidateHttpSession(true)
+//                        .addLogoutHandler(logoutHandler)
+//                        .deleteCookies(cookieNamesToClear)
+//                );
 
         http.exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
         // extract bearer token to verify if user has logged in
