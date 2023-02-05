@@ -1,4 +1,4 @@
-package org.bty.blog.security;
+package org.bty.blog.security.service;
 
 import lombok.RequiredArgsConstructor;
 import org.bty.blog.entity.BlogUser;

@@ -55,8 +55,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
                 OAuth2User oAuth2User = token.getPrincipal();
 
-                // async
-                tokenService.completeUserInfo(token,oAuth2User);
+                // async，可在DaoOAuth2AuthorizedClientService中完成该工作
+                // tokenService.completeUserInfo(token,oAuth2User);
 
 
                 RedisOAuth2User redisOAuth2User = new RedisOAuth2User(oAuth2User, token.getAuthorizedClientRegistrationId());
