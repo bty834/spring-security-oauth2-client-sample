@@ -1,7 +1,8 @@
 package org.bty.blog.security.config;
 
 import lombok.RequiredArgsConstructor;
-import org.bty.blog.security.filter.BearTokenAuthenticationFilter;
+import org.bty.blog.security.entrypoint.RestAuthenticationEntrypoint;
+import org.bty.blog.security.filter.BearerTokenAuthenticationFilter;
 import org.bty.blog.security.handler.*;
 import org.bty.blog.security.service.DaoOAuth2AuthorizedClientService;
 import org.springframework.context.annotation.Bean;
@@ -11,9 +12,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.ExceptionTranslationFilter;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -53,17 +53,17 @@ public class SecurityConfig {
             "/doc.html"
     };
 
-    private final LoginSuccessHandler loginSuccessHandler;
-    private final LoginFailureHandler loginFailureHandler;
-    private final OAuth2LoginSuccessHandler giteeSuccessHandler;
+    private final RestSuccessHandler restSuccessHandler;
+    private final RestFailureHandler restFailureHandler;
+    private final OAuth2RestSuccessHandler giteeSuccessHandler;
 
     private final DaoOAuth2AuthorizedClientService daoOAuth2AuthorizedClientService;
 
     private final CustomSessionAuthenticationStrategy customSessionAuthenticationStrategy;
-    private final BearTokenAuthenticationFilter bearAuthenticationFilter;
+    private final BearerTokenAuthenticationFilter bearAuthenticationFilter;
 
     private final RestAccessDeniedHandler restAccessDeniedHandler;
-
+    private final RestAuthenticationEntrypoint restAuthenticationEntrypoint;
     /**
      * 注意，在
      * @return {@link SecurityConfig#securityFilterChain(HttpSecurity http)}
@@ -103,6 +103,8 @@ public class SecurityConfig {
         // 6. AuthenticationSuccessHandler#onAuthenticationSuccess
         http.sessionManagement().sessionAuthenticationStrategy(customSessionAuthenticationStrategy);
 
+        http.exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
+        http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntrypoint);
         // TODO http.securityContext().securityContextRepository(...);
 
         // 前后端不分离，可指定html返回。该项未测试
@@ -112,9 +114,10 @@ public class SecurityConfig {
         http.formLogin()
                 .usernameParameter("userId")
                 .passwordParameter("password")
-                .loginProcessingUrl("/hello/login")
-                .successHandler(loginSuccessHandler)
-                .failureHandler(loginFailureHandler);
+                // 最好以/login开头，涉及其他地方判断
+                .loginProcessingUrl("/login/yeah")
+                .successHandler(restSuccessHandler)
+                .failureHandler(restFailureHandler);
 //                        .securityContextRepository()  // pass
 
 
@@ -133,7 +136,7 @@ public class SecurityConfig {
         // OAuth2LoginAuthenticationProvider在OAuth2AuthorizationCodeAuthenticationProvider 获取到accessToken基础上执行 accessToken换取资源信息操作
         http.oauth2Login()
                 .successHandler(giteeSuccessHandler)
-                .failureHandler(loginFailureHandler)
+                .failureHandler(restFailureHandler)
 // TODO
 //                // 开始认证访问的地址，获取authorization 的 url，一般通过yaml配置
 //                .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig.baseUri("url"))
@@ -162,10 +165,8 @@ public class SecurityConfig {
 //                        .deleteCookies(cookieNamesToClear)
 //                );
 
-        http.exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
         // extract bearer token to verify if user has logged in
-        http.addFilterBefore(bearAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
+        http.addFilterBefore(bearAuthenticationFilter, OAuth2AuthorizationRequestRedirectFilter.class);
         return http.build();
     }
 

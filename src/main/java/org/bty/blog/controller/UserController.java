@@ -24,13 +24,14 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserController {
 
-
-//    @GetMapping("/gitee")
-//    public ResponseEntity<Map<String, Object>> gitee( @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
-//                        @AuthenticationPrincipal OAuth2User oauth2User) {
-//        HashMap<String, Object> body = new HashMap<>();
-//        body.put("authorizedClient",authorizedClient);
-//        body.put("oauth2User",oauth2User);
-//        return ResponseEntity.ok(body);
-//    }
+    /**
+     * 必须登录才能访问
+     * @return
+     */
+    @GetMapping("/test")
+    public ResponseEntity<Map<String, Object>> gitee() {
+        HashMap<String, Object> body = new HashMap<>();
+        body.put("msg","u win");
+        return ResponseEntity.ok(body);
+    }
 }

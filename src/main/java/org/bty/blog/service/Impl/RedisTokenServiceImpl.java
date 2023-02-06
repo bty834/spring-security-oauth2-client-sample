@@ -3,7 +3,6 @@ package org.bty.blog.service.Impl;
 import lombok.RequiredArgsConstructor;
 import org.bty.blog.entity.BlogRole;
 import org.bty.blog.entity.BlogUser;
-import org.bty.blog.security.handler.LoginSuccessHandler;
 import org.bty.blog.security.util.JwtUtil;
 import org.bty.blog.service.RoleService;
 import org.bty.blog.service.TokenService;
@@ -32,8 +31,8 @@ import static org.springframework.aop.interceptor.AsyncExecutionAspectSupport.DE
  **/
 @Service
 @RequiredArgsConstructor
-public class TokenServiceImpl implements TokenService {
-    private static final Logger logger = LoggerFactory.getLogger(TokenServiceImpl.class);
+public class RedisTokenServiceImpl implements TokenService {
+    private static final Logger logger = LoggerFactory.getLogger(RedisTokenServiceImpl.class);
 
 
 

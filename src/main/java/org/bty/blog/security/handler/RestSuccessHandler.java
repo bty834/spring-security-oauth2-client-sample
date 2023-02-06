@@ -1,7 +1,6 @@
 package org.bty.blog.security.handler;
 
 import lombok.RequiredArgsConstructor;
-import org.bty.blog.security.filter.BearTokenAuthenticationFilter;
 import org.bty.blog.security.model.RedisUserDetail;
 import org.bty.blog.service.TokenService;
 import org.bty.blog.util.JacksonUtil;
@@ -30,8 +29,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  **/
 @Component
 @RequiredArgsConstructor
-public class LoginSuccessHandler implements AuthenticationSuccessHandler {
-    private static final Logger logger = LoggerFactory.getLogger(LoginSuccessHandler.class);
+public class RestSuccessHandler implements AuthenticationSuccessHandler {
+    private static final Logger logger = LoggerFactory.getLogger(RestSuccessHandler.class);
 
     private final TokenService tokenService;
 

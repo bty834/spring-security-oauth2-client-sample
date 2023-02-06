@@ -32,10 +32,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  **/
 @Component
 @RequiredArgsConstructor
-public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
+public class OAuth2RestSuccessHandler implements AuthenticationSuccessHandler {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(OAuth2LoginSuccessHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(OAuth2RestSuccessHandler.class);
 
     private final TokenService tokenService;
 
@@ -62,6 +62,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 RedisOAuth2User redisOAuth2User = new RedisOAuth2User(oAuth2User, token.getAuthorizedClientRegistrationId());
                 // store session and generate jwt
                 // 关于登录信息存储，可以在SecurityContextRepository中完成
+
                 String jwtToken = tokenService.initToken(redisOAuth2User);
                 logger.info("jwt {} for oauth2.0 login user {}",jwtToken,oAuth2User);
 

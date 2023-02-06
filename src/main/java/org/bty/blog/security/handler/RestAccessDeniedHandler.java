@@ -7,8 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,7 +22,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  * @author bty
  * @date 2022/9/26
  * @since 1.8
- * 认证已完成，但是访问的接口权限不足，触发该handler
+ * 认证已完成，但是访问的接口权限不足，抛出{@link AccessDeniedException}时可能触发该handler
+ * 如果未登录且持有匿名用户身份，即使抛出{@link AccessDeniedException}不会触发这个handler，参见 {@link ExceptionTranslationFilter#handleSpringSecurityException(HttpServletRequest, HttpServletResponse, FilterChain, RuntimeException)}
  **/
 @Component
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
