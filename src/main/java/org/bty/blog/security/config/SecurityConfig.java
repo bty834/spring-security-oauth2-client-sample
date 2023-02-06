@@ -1,7 +1,10 @@
 package org.bty.blog.security.config;
 
 import lombok.RequiredArgsConstructor;
+import org.bty.blog.security.JwtAuthenticationManager;
+import org.bty.blog.security.converter.BearerTokenResolver;
 import org.bty.blog.security.entrypoint.RestAuthenticationEntrypoint;
+
 import org.bty.blog.security.filter.BearerTokenAuthenticationFilter;
 import org.bty.blog.security.handler.*;
 import org.bty.blog.security.service.DaoOAuth2AuthorizedClientService;
@@ -14,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -57,13 +61,18 @@ public class SecurityConfig {
     private final RestFailureHandler restFailureHandler;
     private final OAuth2RestSuccessHandler giteeSuccessHandler;
 
+
     private final DaoOAuth2AuthorizedClientService daoOAuth2AuthorizedClientService;
 
     private final CustomSessionAuthenticationStrategy customSessionAuthenticationStrategy;
-    private final BearerTokenAuthenticationFilter bearAuthenticationFilter;
 
     private final RestAccessDeniedHandler restAccessDeniedHandler;
     private final RestAuthenticationEntrypoint restAuthenticationEntrypoint;
+    private final BearerTokenResolver bearerTokenResolver;
+    private final JwtAuthenticationManager jwtAuthenticationManager;
+
+
+    private final BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter;
     /**
      * 注意，在
      * @return {@link SecurityConfig#securityFilterChain(HttpSecurity http)}
@@ -84,7 +93,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-
+        // 前后端分离可以禁用
         http.csrf().disable();
         // 必须显式注明，配合CorsConfigurationSource的Bean，不然即使在web里面配置了跨域，security这里依然会cors error
         http.cors();
@@ -154,6 +163,7 @@ public class SecurityConfig {
 //                .authorizedClientRepository(...)
                   .authorizedClientService(daoOAuth2AuthorizedClientService);
 
+
 // TODO
 //        http
 //              .logout(logout -> logout
@@ -166,7 +176,9 @@ public class SecurityConfig {
 //                );
 
         // extract bearer token to verify if user has logged in
-        http.addFilterBefore(bearAuthenticationFilter, OAuth2AuthorizationRequestRedirectFilter.class);
+        http.addFilterBefore(bearerTokenAuthenticationFilter, OAuth2AuthorizationRequestRedirectFilter.class);
+
+
         return http.build();
     }
 
@@ -184,7 +196,6 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
 
 
 

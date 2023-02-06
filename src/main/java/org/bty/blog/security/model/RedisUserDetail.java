@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 用于存储到Redis的登录信息实体，适用于UsernamePassword Login
  * @author bty
  * @date 2022/10/4
  * @since 1.8

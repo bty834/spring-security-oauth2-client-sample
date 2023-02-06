@@ -6,6 +6,7 @@ import org.bty.blog.security.model.RedisOAuth2User;
 
 import org.bty.blog.service.TokenService;
 
+import org.bty.blog.service.UserService;
 import org.bty.blog.util.JacksonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
@@ -31,14 +33,18 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  * 第三方Oauth2.0 gitee登录成功时的处理
  **/
 @Component
-@RequiredArgsConstructor
-public class OAuth2RestSuccessHandler implements AuthenticationSuccessHandler {
+public class OAuth2RestSuccessHandler extends BaseLoginRestSuccessHandler {
 
 
     private static final Logger logger = LoggerFactory.getLogger(OAuth2RestSuccessHandler.class);
 
-    private final TokenService tokenService;
+    private UserService userService;
 
+
+    public OAuth2RestSuccessHandler(TokenService tokenService,UserService userService) {
+        super(tokenService);
+        this.userService = userService;
+    }
 
 
     /**
@@ -50,28 +56,13 @@ public class OAuth2RestSuccessHandler implements AuthenticationSuccessHandler {
      * @throws ServletException
      */
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public Object handlerLogin(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
+        OAuth2User oAuth2User = token.getPrincipal();
 
-                OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
-                OAuth2User oAuth2User = token.getPrincipal();
+        // async，可在DaoOAuth2AuthorizedClientService中完成该工作
+        userService.addUser(token, oAuth2User);
 
-                // async，可在DaoOAuth2AuthorizedClientService中完成该工作
-                // tokenService.completeUserInfo(token,oAuth2User);
-
-
-                RedisOAuth2User redisOAuth2User = new RedisOAuth2User(oAuth2User, token.getAuthorizedClientRegistrationId());
-                // store session and generate jwt
-                // 关于登录信息存储，可以在SecurityContextRepository中完成
-
-                String jwtToken = tokenService.initToken(redisOAuth2User);
-                logger.info("jwt {} for oauth2.0 login user {}",jwtToken,oAuth2User);
-
-                response.setContentType(APPLICATION_JSON_UTF8_VALUE);
-                response.getWriter().write(
-                        JacksonUtil.getObjectMapper().writeValueAsString(
-                                ResponseEntity.ok(Collections.singletonMap("token", jwtToken))
-                        )
-                );
-
+        return new RedisOAuth2User(oAuth2User, token.getAuthorizedClientRegistrationId());
     }
 }

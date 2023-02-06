@@ -1,7 +1,7 @@
 package org.bty.blog.security;
 
 import lombok.RequiredArgsConstructor;
-import org.bty.blog.security.model.BearerTokenAuthenticationToken;
+import org.bty.blog.security.model.JwtAuthenticationToken;
 import org.bty.blog.security.model.RedisOAuth2User;
 import org.bty.blog.security.model.RedisUserDetail;
 import org.bty.blog.service.TokenService;
@@ -16,36 +16,32 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.stereotype.Component;
 
 /**
+ * 用于BearerToken的认证，具体由{@link TokenService}实现
  * @author bty
  * @date 2023/2/6
  * @since 1.8
  **/
 @Component
 @RequiredArgsConstructor
-public class BearerTokenAuthenticationManager implements AuthenticationManager {
+public class JwtAuthenticationManager implements AuthenticationManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(BearerTokenAuthenticationManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationManager.class);
 
     private final TokenService tokenService;
 
     /**
      *
-     * @param authentication {@link BearerTokenAuthenticationToken}
+     * @param authentication {@link JwtAuthenticationToken}
      * @return {@link UsernamePasswordAuthenticationToken} or {@link OAuth2AuthenticationToken}
      * @throws AuthenticationException
      */
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        BearerTokenAuthenticationToken bearerToken = (BearerTokenAuthenticationToken) authentication;
+        JwtAuthenticationToken jwtToken = (JwtAuthenticationToken) authentication;
 
-        String token = bearerToken.getToken();
+        String token = jwtToken.getToken();
 
-        Object o;
-        try {
-            o = tokenService.verifyToken(token);
-        } catch (Exception e) {
-            throw new SessionAuthenticationException(e.getMessage());
-        }
+        Object o = tokenService.verifyAccessToken(token);
 
         Authentication authenticationResult;
 

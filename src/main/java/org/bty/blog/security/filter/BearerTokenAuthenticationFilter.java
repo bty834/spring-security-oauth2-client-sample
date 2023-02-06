@@ -1,19 +1,22 @@
 package org.bty.blog.security.filter;
 
 import lombok.RequiredArgsConstructor;
-import org.bty.blog.security.BearerTokenAuthenticationManager;
+import org.bty.blog.security.JwtAuthenticationManager;
 import org.bty.blog.security.converter.BearerTokenResolver;
 import org.bty.blog.security.entrypoint.RestAuthenticationEntrypoint;
 import org.bty.blog.security.handler.RestFailureHandler;
-import org.bty.blog.security.model.BearerTokenAuthenticationToken;
+import org.bty.blog.security.model.JwtAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.context.NullSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -32,24 +35,29 @@ import java.io.IOException;
  * @since 1.8
  **/
 @Component
-@RequiredArgsConstructor
 public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(BearerTokenAuthenticationFilter.class);
 
-    private final RestAuthenticationEntrypoint entrypoint;
+    private final AuthenticationEntryPoint entrypoint;
 
     private final BearerTokenResolver bearerTokenResolver;
 
-    private final BearerTokenAuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    private final RestFailureHandler failureHandler;
+    private final AuthenticationFailureHandler failureHandler;
 
     private SecurityContextRepository securityContextRepository = new NullSecurityContextRepository();
 
     private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
 
 
+    public BearerTokenAuthenticationFilter(AuthenticationEntryPoint entrypoint, BearerTokenResolver bearerTokenResolver, AuthenticationManager authenticationManager, AuthenticationFailureHandler failureHandler) {
+        this.entrypoint = entrypoint;
+        this.bearerTokenResolver = bearerTokenResolver;
+        this.authenticationManager = authenticationManager;
+        this.failureHandler = failureHandler;
+    }
 
     public void setSecurityContextRepository(SecurityContextRepository securityContextRepository) {
         this.securityContextRepository = securityContextRepository;
@@ -68,6 +76,7 @@ public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+
         String token;
 
         try {
@@ -84,11 +93,11 @@ public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        BearerTokenAuthenticationToken bearerTokenAuthenticationToken = new BearerTokenAuthenticationToken(token);
-        bearerTokenAuthenticationToken.setDetails(this.authenticationDetailsSource.buildDetails(request));
+        JwtAuthenticationToken jwtAuthenticationToken = new JwtAuthenticationToken(token);
+        jwtAuthenticationToken.setDetails(this.authenticationDetailsSource.buildDetails(request));
 
         try {
-            Authentication authenticationResult = authenticationManager.authenticate(bearerTokenAuthenticationToken);
+            Authentication authenticationResult = authenticationManager.authenticate(jwtAuthenticationToken);
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authenticationResult);
             SecurityContextHolder.setContext(context);

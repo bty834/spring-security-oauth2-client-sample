@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * 用于存储到Redis的登录信息实体，适用于 OAuth2.0 Login
  * @author bty
  * @date 2022/10/4
  * @since 1.8

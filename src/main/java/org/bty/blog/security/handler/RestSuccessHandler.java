@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
@@ -24,40 +25,30 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  * @author bty
  * @date 2022/10/2
  * @since 1.8
- *
+ * <p>
  * 普通用户名密码登录成功时的处理，记录登录状态并返回jwt
  **/
 @Component
-@RequiredArgsConstructor
-public class RestSuccessHandler implements AuthenticationSuccessHandler {
+public class RestSuccessHandler extends BaseLoginRestSuccessHandler {
     private static final Logger logger = LoggerFactory.getLogger(RestSuccessHandler.class);
 
-    private final TokenService tokenService;
+    public RestSuccessHandler(TokenService tokenService) {
+        super(tokenService);
+    }
+
 
     /**
-     *
-     * @param request the request which caused the successful authentication
-     * @param response the response
+     * @param request        the request which caused the successful authentication
+     * @param response       the response
      * @param authentication 普通用户名密码登录时类型为 {@link UsernamePasswordAuthenticationToken}
-     * the authentication process.
+     *                       the authentication process.
      * @throws IOException
      */
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-            UserDetails user = (UserDetails)authentication.getPrincipal();
+    public Object handlerLogin(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        UserDetails user = (UserDetails) authentication.getPrincipal();
 
-            RedisUserDetail redisUserDetail = new RedisUserDetail(user);
-            // 关于登录信息存储，可以在SecurityContextRepository中完成
-            String jwtToken = tokenService.initToken(redisUserDetail);
-
-            logger.info("jwt {} for username-password login user {}",jwtToken,user);
-
-            response.setContentType(APPLICATION_JSON_UTF8_VALUE);
-            response.getWriter().write(
-                    JacksonUtil.getObjectMapper().writeValueAsString(
-                            ResponseEntity.ok(Collections.singletonMap("token", jwtToken))
-                    )
-            );
+        return new RedisUserDetail(user);
     }
 
 }

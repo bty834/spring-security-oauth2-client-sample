@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.bty.blog.entity.BlogUser;
 import org.bty.blog.service.PermissionService;
 import org.bty.blog.service.UserService;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -19,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * UsernamePassword Login 流程中的 {@link DaoAuthenticationProvider}最终调用该接口实现类
  * @author bty
  * @date 2022/10/2
  * @since 1.8

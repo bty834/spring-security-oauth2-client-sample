@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 /**
  * 自定义GrantedAuthoritiesMapper
+ * 该类对返回的{@link GrantedAuthority}进一步做处理，返回也是{@link GrantedAuthority}
  *
  * @author bty
  * @date 2023/2/5
