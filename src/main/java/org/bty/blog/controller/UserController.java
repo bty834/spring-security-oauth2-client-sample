@@ -7,6 +7,8 @@ import org.bty.blog.entity.BlogUser;
 import org.bty.blog.security.converter.BearerTokenResolver;
 import org.bty.blog.service.TokenService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,32 +35,36 @@ public class UserController {
 
     private final TokenService tokenService;
 
-    private final BearerTokenResolver bearerTokenResolver;
-
     /**
      * 必须登录才能访问
      * @return
      */
     @GetMapping("/test")
-    public ResponseEntity<Map<String, Object>> gitee() {
-        HashMap<String, Object> body = new HashMap<>();
-        body.put("msg","u win");
-        return ResponseEntity.ok(body);
+    public ResponseEntity<Map<String, Object>> gogo() {
+        return ResponseEntity.ok(Collections.singletonMap("msg","u logged in"));
     }
 
     /**
-     * 必须登录才能访问
+     * {@link EnableMethodSecurity} 注解必须配置在配置类上<br/>
+     * {@link PreAuthorize}等注解中表达式使用 Spring EL
      * @return
      */
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin")
+    public ResponseEntity<Map<String, Object>> admin() {
+
+        return ResponseEntity.ok(Collections.singletonMap("msg","u r admin"));
+    }
+
+
+
     @GetMapping("/refreshAccessToken")
     public ResponseEntity<Map<String, Object>> refresh(String refreshToken) {
-        HashMap<String, Object> body = new HashMap<>();
 
         if(Strings.isNullOrEmpty(refreshToken)){
-            body.put("msg","no refreshToken or invalid refreshToken");
-            return ResponseEntity.ok(body);
+            return ResponseEntity.ok(Collections.singletonMap("msg","no refreshToken or invalid refreshToken"));
         }
-        body.put("token",tokenService.refreshAccessToken(refreshToken));
-        return ResponseEntity.ok(body);
+        String accessToken = tokenService.refreshAccessToken(refreshToken);
+        return ResponseEntity.ok(Collections.singletonMap("accessToken",accessToken));
     }
 }

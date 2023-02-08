@@ -39,8 +39,8 @@ public class SecurityConfig {
             "/v2/api-docs",
             "/swagger-resources",
             "/swagger-resources/**",
-            "/configuration/ui",
-            "/configuration/security",
+            "/configuration/**",
+
             // 注意swagger2
             // 3.0.0版本之前访问/swagger-ui.html
             // 3.0.0版本之后访问/swagger-ui/index.html
@@ -71,11 +71,12 @@ public class SecurityConfig {
     private final AuthenticationEntryPoint restAuthenticationEntrypoint;
 
     private final BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter;
+
     /**
      * 注意，在
+     *
      * @return {@link SecurityConfig#securityFilterChain(HttpSecurity http)}
      * 以上的方法中必须注明 {@code http.cors()}
-     *
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -95,6 +96,13 @@ public class SecurityConfig {
         http.csrf().disable();
         // 必须显式注明，配合CorsConfigurationSource的Bean，不然即使在web里面配置了跨域，security这里依然会cors error
         http.cors();
+
+        // antMatcher or mvcMatcher
+        http.authorizeHttpRequests()
+                .antMatchers(AUTH_WHITELIST).permitAll()
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().denyAll();
+
         http.authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated();
@@ -160,7 +168,7 @@ public class SecurityConfig {
 //                // 否则
 //                // 匿名存储调用OAuth2AuthorizedClientRepository的另一个实现类用session存储
 //                .authorizedClientRepository(...)
-                  .authorizedClientService(daoOAuth2AuthorizedClientService);
+                .authorizedClientService(daoOAuth2AuthorizedClientService);
 
 
 // TODO
@@ -174,7 +182,7 @@ public class SecurityConfig {
 //                        .deleteCookies(cookieNamesToClear)
 //                );
 
-        // extract bearer token to verify if user has logged in
+        // extract bearer token to verify if the user has logged in
         http.addFilterBefore(bearerTokenAuthenticationFilter, OAuth2AuthorizationRequestRedirectFilter.class);
 
 
@@ -183,6 +191,7 @@ public class SecurityConfig {
 
     /**
      * 对所有SecurityFilterChain做处理
+     *
      * @return
      */
     @Bean
@@ -192,10 +201,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
 
 }
