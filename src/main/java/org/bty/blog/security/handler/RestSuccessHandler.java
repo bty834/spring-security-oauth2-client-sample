@@ -28,7 +28,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  * <p>
  * 普通用户名密码登录成功时的处理，记录登录状态并返回jwt
  **/
-@Component
+@Component("restSuccessHandler")
 public class RestSuccessHandler extends BaseLoginRestSuccessHandler {
     private static final Logger logger = LoggerFactory.getLogger(RestSuccessHandler.class);
 

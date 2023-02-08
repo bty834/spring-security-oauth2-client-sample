@@ -32,7 +32,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  * @since 1.8
  * 第三方Oauth2.0 gitee登录成功时的处理
  **/
-@Component
+@Component("oAuth2RestSuccessHandler")
 public class OAuth2RestSuccessHandler extends BaseLoginRestSuccessHandler {
 
 

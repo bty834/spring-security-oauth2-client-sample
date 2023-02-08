@@ -1,10 +1,7 @@
 package org.bty.blog.security.filter;
 
-import lombok.RequiredArgsConstructor;
-import org.bty.blog.security.JwtAuthenticationManager;
+
 import org.bty.blog.security.converter.BearerTokenResolver;
-import org.bty.blog.security.entrypoint.RestAuthenticationEntrypoint;
-import org.bty.blog.security.handler.RestFailureHandler;
 import org.bty.blog.security.model.JwtAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

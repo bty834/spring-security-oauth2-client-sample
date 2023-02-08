@@ -1,13 +1,9 @@
 package org.bty.blog.security.config;
 
 import lombok.RequiredArgsConstructor;
-import org.bty.blog.security.JwtAuthenticationManager;
-import org.bty.blog.security.converter.BearerTokenResolver;
-import org.bty.blog.security.entrypoint.RestAuthenticationEntrypoint;
 
 import org.bty.blog.security.filter.BearerTokenAuthenticationFilter;
 import org.bty.blog.security.handler.*;
-import org.bty.blog.security.service.DaoOAuth2AuthorizedClientService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -15,9 +11,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -57,20 +57,18 @@ public class SecurityConfig {
             "/doc.html"
     };
 
+
     private final RestSuccessHandler restSuccessHandler;
-    private final RestFailureHandler restFailureHandler;
-    private final OAuth2RestSuccessHandler giteeSuccessHandler;
+    private final AuthenticationFailureHandler restFailureHandler;
+    private final OAuth2RestSuccessHandler oAuth2SuccessHandler;
 
 
-    private final DaoOAuth2AuthorizedClientService daoOAuth2AuthorizedClientService;
+    private final OAuth2AuthorizedClientService daoOAuth2AuthorizedClientService;
 
-    private final CustomSessionAuthenticationStrategy customSessionAuthenticationStrategy;
+    private final SessionAuthenticationStrategy customSessionAuthenticationStrategy;
 
-    private final RestAccessDeniedHandler restAccessDeniedHandler;
-    private final RestAuthenticationEntrypoint restAuthenticationEntrypoint;
-    private final BearerTokenResolver bearerTokenResolver;
-    private final JwtAuthenticationManager jwtAuthenticationManager;
-
+    private final AccessDeniedHandler restAccessDeniedHandler;
+    private final AuthenticationEntryPoint restAuthenticationEntrypoint;
 
     private final BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter;
     /**
@@ -112,6 +110,7 @@ public class SecurityConfig {
         // 6. AuthenticationSuccessHandler#onAuthenticationSuccess
         http.sessionManagement().sessionAuthenticationStrategy(customSessionAuthenticationStrategy);
 
+
         http.exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
         http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntrypoint);
         // TODO http.securityContext().securityContextRepository(...);
@@ -144,7 +143,7 @@ public class SecurityConfig {
         // OAuth2LoginAuthenticationProvider 中有个 OAuth2AuthorizationCodeAuthenticationProvider ，后者专门用于 code换取accessToken操作
         // OAuth2LoginAuthenticationProvider在OAuth2AuthorizationCodeAuthenticationProvider 获取到accessToken基础上执行 accessToken换取资源信息操作
         http.oauth2Login()
-                .successHandler(giteeSuccessHandler)
+                .successHandler(oAuth2SuccessHandler)
                 .failureHandler(restFailureHandler)
 // TODO
 //                // 开始认证访问的地址，获取authorization 的 url，一般通过yaml配置
