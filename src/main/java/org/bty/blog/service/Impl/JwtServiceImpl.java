@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
  **/
 @Service
 @RequiredArgsConstructor
-public class JwtService implements TokenService {
-    private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
+public class JwtServiceImpl implements TokenService {
+    private static final Logger logger = LoggerFactory.getLogger(JwtServiceImpl.class);
 
 
     @Value("${token.access-token-expire-minutes}")
