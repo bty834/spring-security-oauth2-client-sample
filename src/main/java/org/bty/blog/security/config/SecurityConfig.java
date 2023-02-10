@@ -30,7 +30,7 @@ import java.util.Collections;
  * @since 1.8
  **/
 @Configuration
-@EnableMethodSecurity()
+@EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
@@ -100,12 +100,19 @@ public class SecurityConfig {
         // antMatcher or mvcMatcher
         http.authorizeHttpRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
+                // hasRole中不需要添加 ROLE_前缀
+                // ant 匹配 /admin /admin/a /admin/a/b 都会匹配上
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().denyAll();
-
-        http.authorizeRequests()
-                .antMatchers(AUTH_WHITELIST).permitAll()
+                // 剩下的需要认证
                 .anyRequest().authenticated();
+                // denyAll慎用
+//                .anyRequest().denyAll();
+
+//        http.authorizeHttpRequests()
+//                .mvcMatchers(AUTH_WHITELIST).permitAll()
+//                        // 效果同上
+//                        .mvcMatchers("/admin").hasRole("ADMIN")
+//                        .anyRequest().denyAll();
 
         // 设置登录成功后session处理, 认证成功后
         // SessionAuthenticationStrategy的最早执行，详见AbstractAuthenticationProcessingFilter
