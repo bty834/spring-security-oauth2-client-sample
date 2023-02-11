@@ -2,8 +2,6 @@ package org.bty.blog.security;
 
 import lombok.RequiredArgsConstructor;
 import org.bty.blog.security.model.JwtAuthenticationToken;
-import org.bty.blog.security.model.RedisOAuth2User;
-import org.bty.blog.security.model.RedisUserDetail;
 import org.bty.blog.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,23 +41,10 @@ public class JwtAuthenticationManager implements AuthenticationManager {
 
         Object o = tokenService.verifyAccessToken(token);
 
-        Authentication authenticationResult;
-
-        if (o instanceof RedisUserDetail) {
-
-            RedisUserDetail userDetail = (RedisUserDetail) o;
-            authenticationResult = new UsernamePasswordAuthenticationToken(userDetail.getUsername(),
-                    null,
-                    userDetail.getAuthorities());
-
-        } else if (o instanceof RedisOAuth2User) {
-            RedisOAuth2User oAuth2User = (RedisOAuth2User) o;
-            authenticationResult = new OAuth2AuthenticationToken(oAuth2User, oAuth2User.getAuthorities(), oAuth2User.getRegistrationId());
-        } else {
-            logger.error("not valid token");
-            throw new SessionAuthenticationException("not valid token");
+        if(!(o instanceof Authentication)){
+            throw new SessionAuthenticationException("session not found");
         }
         logger.info("bearer token is authenticated , authentication is :{}",authentication);
-        return authenticationResult;
+        return (Authentication)o;
     }
 }
