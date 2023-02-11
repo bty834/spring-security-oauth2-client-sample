@@ -9,7 +9,9 @@ import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
 
 import org.bty.blog.security.filter.BearerTokenAuthenticationFilter;
+import org.bty.blog.security.filter.CaptchaVerifyFilter;
 import org.bty.blog.security.handler.*;
+import org.bty.blog.service.CaptchaService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +30,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -49,6 +52,8 @@ public class SecurityConfig {
 
 
 
+    @Value("${login.uri}")
+    private String loginUri;
 
     private static final String[] AUTH_WHITELIST = {
 
@@ -79,6 +84,7 @@ public class SecurityConfig {
     private final AuthenticationFailureHandler restFailureHandler;
     private final OAuth2RestSuccessHandler oAuth2SuccessHandler;
 
+    private final CaptchaService captchaService;
 
     private final OAuth2AuthorizedClientService daoOAuth2AuthorizedClientService;
 
@@ -117,6 +123,7 @@ public class SecurityConfig {
         // antMatcher or mvcMatcher
         http.authorizeHttpRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
+                .antMatchers("/token/**").permitAll()
                 // hasRole中不需要添加 ROLE_前缀
                 // ant 匹配 /admin /admin/a /admin/a/b 都会匹配上
                 .antMatchers("/admin/**").hasRole("ADMIN")
@@ -155,7 +162,7 @@ public class SecurityConfig {
                 .usernameParameter("userId")
                 .passwordParameter("password")
                 // 最好以/login开头，涉及其他地方判断
-                .loginProcessingUrl("/login/yeah")
+                .loginProcessingUrl(loginUri)
                 .successHandler(restSuccessHandler)
                 .failureHandler(restFailureHandler);
 //                        .securityContextRepository()  // pass
@@ -208,6 +215,9 @@ public class SecurityConfig {
 
         // extract bearer token to verify if the user has logged in
         http.addFilterBefore(bearerTokenAuthenticationFilter, OAuth2AuthorizationRequestRedirectFilter.class);
+
+        // username password登录之前先校验captcha
+        http.addFilterBefore(new CaptchaVerifyFilter(loginUri,captchaService,restFailureHandler), UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();

@@ -33,7 +33,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final TokenService tokenService;
 
     /**
      * 必须登录才能访问
@@ -58,13 +57,5 @@ public class UserController {
 
 
 
-    @GetMapping("/refreshAccessToken")
-    public ResponseEntity<Map<String, Object>> refresh(String refreshToken) {
 
-        if(Strings.isNullOrEmpty(refreshToken)){
-            return ResponseEntity.ok(Collections.singletonMap("msg","no refreshToken or invalid refreshToken"));
-        }
-        String accessToken = tokenService.refreshAccessToken(refreshToken);
-        return ResponseEntity.ok(Collections.singletonMap("accessToken",accessToken));
-    }
 }

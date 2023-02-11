@@ -1,3 +1,18 @@
 spring:
   profiles:
     active: dev
+
+
+captcha:
+  enabled: true
+  border: false
+  width: 130
+  height: 48
+  font-size: 30
+  char-length: 4
+  font: 微软雅黑
+  expireSeconds: 60
+
+
+login:
+  uri: /login
