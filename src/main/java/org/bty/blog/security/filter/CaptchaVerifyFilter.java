@@ -26,9 +26,15 @@ public class CaptchaVerifyFilter extends OncePerRequestFilter {
     public static final String SPRING_SECURITY_FORM_UUID_KEY = "uuid";
     public static final String SPRING_SECURITY_FORM_CAPTCHA_KEY = "captcha";
 
+    private String uuidKey = SPRING_SECURITY_FORM_UUID_KEY;
+    private String inputKey = SPRING_SECURITY_FORM_CAPTCHA_KEY;
+
+
     private final String loginUri;
     private final CaptchaService captchaService;
     private final AuthenticationFailureHandler failureHandler;
+
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -63,12 +69,18 @@ public class CaptchaVerifyFilter extends OncePerRequestFilter {
 
 
     protected String obtainUuid(HttpServletRequest request) {
-        return request.getParameter(SPRING_SECURITY_FORM_UUID_KEY);
+        return request.getParameter(this.uuidKey);
     }
 
     protected String obtainCaptcha(HttpServletRequest request) {
-        return request.getParameter(SPRING_SECURITY_FORM_CAPTCHA_KEY);
+        return request.getParameter(this.inputKey);
     }
 
+    public void setUuidKey(String uuidKey) {
+        this.uuidKey = uuidKey;
+    }
 
+    public void setInputKey(String inputKey) {
+        this.inputKey = inputKey;
+    }
 }
