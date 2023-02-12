@@ -3,6 +3,7 @@ package org.bty.blog.service.Impl;
 
 import lombok.RequiredArgsConstructor;
 import org.bty.blog.provider.TokenPersistProvider;
+import org.bty.blog.security.model.SerializableToken;
 import org.bty.blog.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,14 +48,14 @@ public class JwtServiceImpl implements TokenService {
     }
 
     @Override
-    public String createAccessToken(Object user) {
+    public  String createAccessToken(SerializableToken user) throws RuntimeException{
         String accessToken = UUID.randomUUID().toString();
         tokenPersistProvider.persist(getAccessTokenRedisKey(accessToken),user,accessTokenExpireMinutes,TimeUnit.MINUTES);
         return generateJwt("accessToken", accessToken, accessTokenExpireMinutes);
     }
 
     @Override
-    public String createRefreshToken(Object user) {
+    public String createRefreshToken(SerializableToken user) throws RuntimeException{
         String refreshToken = UUID.randomUUID().toString();
         tokenPersistProvider.persist(getRefreshTokenRedisKey(refreshToken),user,accessTokenExpireMinutes,TimeUnit.MINUTES);
         return generateJwt("refreshToken", refreshToken, refreshTokenExpireMinutes);
@@ -74,19 +75,26 @@ public class JwtServiceImpl implements TokenService {
 
 
     @Override
-    public String refreshAccessToken(String jwt) {
+    public String refreshAccessToken(String jwt) throws RuntimeException{
         Jwt decode = jwtDecoder.decode(jwt);
         String refreshToken = decode.getClaim("refreshToken");
-        Object user = tokenPersistProvider.get(getRefreshTokenRedisKey(refreshToken),refreshTokenExpireMinutes,TimeUnit.MINUTES);
+        SerializableToken user = tokenPersistProvider.get(getRefreshTokenRedisKey(refreshToken),refreshTokenExpireMinutes,TimeUnit.MINUTES);
         return createAccessToken(user);
     }
 
 
     @Override
-    public Object verifyAccessToken(String jwt) {
+    public SerializableToken verifyAccessToken(String jwt) throws RuntimeException{
         Jwt decode = jwtDecoder.decode(jwt);
         String accessToken = decode.getClaim("accessToken");
         return tokenPersistProvider.get(getAccessTokenRedisKey(accessToken),accessTokenExpireMinutes,TimeUnit.MINUTES);
+    }
+
+    @Override
+    public void invalidToken(String jwt) throws RuntimeException {
+        Jwt decode = jwtDecoder.decode(jwt);
+        String accessToken = decode.getClaim("accessToken");
+        tokenPersistProvider.invalid(getAccessTokenRedisKey(accessToken));
     }
 
 

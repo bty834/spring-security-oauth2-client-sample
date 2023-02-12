@@ -1,17 +1,24 @@
 package org.bty.blog.security.handler;
 
 
+import org.bty.blog.security.model.SerializableToken;
 import org.bty.blog.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
 
 
 /**
@@ -38,8 +45,14 @@ public class RestSuccessHandler extends BaseRestSuccessHandler {
      * @throws IOException
      */
     @Override
-    public Object handlerLogin(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        return authentication;
+    public SerializableToken handlerLogin(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+
+        SerializableToken serializableToken = SerializableToken.adaptAuthentication(authentication);
+
+        if (serializableToken == null) {
+            throw new ProviderNotFoundException("AuthenticationType not support");
+        }
+        return serializableToken;
     }
 
 }

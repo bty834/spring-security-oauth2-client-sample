@@ -2,9 +2,11 @@ package org.bty.blog.security;
 
 import lombok.RequiredArgsConstructor;
 import org.bty.blog.security.model.JwtAuthenticationToken;
+import org.bty.blog.security.model.SerializableToken;
 import org.bty.blog.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * 用于BearerToken的认证，具体由{@link TokenService}实现
+ *
  * @author bty
  * @date 2023/2/6
  * @since 1.8
@@ -27,8 +30,9 @@ public class JwtAuthenticationManager implements AuthenticationManager {
 
     private final TokenService tokenService;
 
+    private final OAuth2ClientProperties p;
+
     /**
-     *
      * @param authentication {@link JwtAuthenticationToken}
      * @return {@link UsernamePasswordAuthenticationToken} or {@link OAuth2AuthenticationToken}
      * @throws AuthenticationException
@@ -39,12 +43,18 @@ public class JwtAuthenticationManager implements AuthenticationManager {
 
         String token = jwtToken.getToken();
 
-        Object o = tokenService.verifyAccessToken(token);
+        try {
+            SerializableToken o = tokenService.verifyAccessToken(token);
 
-        if(!(o instanceof Authentication)){
-            throw new SessionAuthenticationException("session not found");
+            Authentication reverseAuthentication = SerializableToken.reverseAuthentication(o, p);
+
+            if (reverseAuthentication == null) {
+                throw new SessionAuthenticationException("session not found");
+            }
+            logger.info("bearer token is authenticated , authentication is :{}", authentication);
+            return reverseAuthentication;
+        } catch (RuntimeException e) {
+            throw new SessionAuthenticationException(e.getMessage());
         }
-        logger.info("bearer token is authenticated , authentication is :{}",authentication);
-        return (Authentication)o;
     }
 }

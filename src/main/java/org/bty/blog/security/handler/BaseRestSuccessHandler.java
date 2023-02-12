@@ -1,5 +1,6 @@
 package org.bty.blog.security.handler;
 
+import org.bty.blog.security.model.SerializableToken;
 import org.bty.blog.service.TokenService;
 import org.bty.blog.util.JacksonUtil;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ abstract public class BaseRestSuccessHandler implements AuthenticationSuccessHan
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        Object o = handlerLogin(request, response, authentication);
+        SerializableToken o = handlerLogin(request, response, authentication);
 
         // 关于登录信息存储，可以在SecurityContextRepository中完成
         String accessToken = tokenService.createAccessToken(o);
@@ -53,5 +54,5 @@ abstract public class BaseRestSuccessHandler implements AuthenticationSuccessHan
         );
     }
 
-    abstract public Object handlerLogin(HttpServletRequest request, HttpServletResponse response, Authentication authentication);
+    abstract public SerializableToken handlerLogin(HttpServletRequest request, HttpServletResponse response, Authentication authentication);
 }

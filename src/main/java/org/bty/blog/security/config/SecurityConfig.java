@@ -8,6 +8,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
 
+import org.bty.blog.config.CaptchaProperties;
 import org.bty.blog.security.converter.BearerTokenResolver;
 import org.bty.blog.security.filter.BearerTokenAuthenticationFilter;
 import org.bty.blog.security.filter.CaptchaVerifyFilter;
@@ -34,6 +35,9 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -57,6 +61,9 @@ public class SecurityConfig {
 
     @Value("${login.uri}")
     private String loginUri;
+
+    @Value("${logout.uri}")
+    private String logoutUri;
 
     private static final String[] AUTH_WHITELIST = {
 
@@ -99,6 +106,13 @@ public class SecurityConfig {
     private final BearerTokenResolver bearerTokenResolver;
 
     private final AuthenticationManager jwtAuthenticationManager;
+
+
+    private final LogoutSuccessHandler logoutSuccessHandler;
+    private final LogoutHandler logoutHandler;
+
+    @Value("${captcha.enabled}")
+    private boolean captchaEnabled;
     /**
      * 注意，在
      *
@@ -163,7 +177,7 @@ public class SecurityConfig {
 
         // 前后端分离下username/password登录
         http.formLogin()
-                .usernameParameter("userId")
+                .usernameParameter("username")
                 .passwordParameter("password")
                 // 最好以/login开头，涉及其他地方判断
                 .loginProcessingUrl(loginUri)
@@ -206,22 +220,21 @@ public class SecurityConfig {
                 .authorizedClientService(daoOAuth2AuthorizedClientService);
 
 
-// TODO
-//        http
-//              .logout(logout -> logout
-//                        .logoutUrl("/my/logout")
-//                        .logoutSuccessUrl("/my/index")
-//                        .logoutSuccessHandler(logoutSuccessHandler)
-//                        .invalidateHttpSession(true)
-//                        .addLogoutHandler(logoutHandler)
-//                        .deleteCookies(cookieNamesToClear)
-//                );
+        http.logout()
+                .logoutUrl(logoutUri)
+                .addLogoutHandler(logoutHandler)
+                .logoutSuccessHandler(logoutSuccessHandler)
+                .invalidateHttpSession(true);
 
         // extract bearer token to verify if the user has logged in
+        // before logout filter, to logout needs user logged in
         http.addFilterBefore(new BearerTokenAuthenticationFilter(restAuthenticationEntrypoint,bearerTokenResolver,jwtAuthenticationManager,restFailureHandler), OAuth2AuthorizationRequestRedirectFilter.class);
 
+
+        CaptchaVerifyFilter captchaVerifyFilter = new CaptchaVerifyFilter(loginUri, captchaService, restFailureHandler);
+        captchaVerifyFilter.setCaptchaEnabled(captchaEnabled);
         // username password登录之前先校验captcha
-        http.addFilterBefore(new CaptchaVerifyFilter(loginUri,captchaService,restFailureHandler), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(captchaVerifyFilter, UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();

@@ -29,7 +29,7 @@ public class CaptchaVerifyFilter extends OncePerRequestFilter {
     private String uuidKey = SPRING_SECURITY_FORM_UUID_KEY;
     private String inputKey = SPRING_SECURITY_FORM_CAPTCHA_KEY;
 
-
+    private boolean captchaEnabled = false;
     private final String loginUri;
     private final CaptchaService captchaService;
     private final AuthenticationFailureHandler failureHandler;
@@ -38,8 +38,9 @@ public class CaptchaVerifyFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         // 不是登录，直接跳过
-        if(!request.getServletPath().equals(loginUri)){
+        if(!captchaEnabled || !request.getServletPath().equals(loginUri)){
             filterChain.doFilter(request,response);
             return;
         }
@@ -82,5 +83,9 @@ public class CaptchaVerifyFilter extends OncePerRequestFilter {
 
     public void setInputKey(String inputKey) {
         this.inputKey = inputKey;
+    }
+
+    public void setCaptchaEnabled(boolean captchaEnabled) {
+        this.captchaEnabled = captchaEnabled;
     }
 }

@@ -66,7 +66,7 @@ public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+        // 登录以 /login 或 /oauth2开头
         if(request.getServletPath().startsWith("/login") || request.getServletPath().startsWith("/oauth2")){
             logger.info("skip token authentication for path {}",request.getServletPath());
             filterChain.doFilter(request,response);
