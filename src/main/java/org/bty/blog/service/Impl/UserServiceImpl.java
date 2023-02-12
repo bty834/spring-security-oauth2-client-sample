@@ -7,16 +7,24 @@ import org.bty.blog.service.RoleService;
 import org.bty.blog.service.UserRoleService;
 import org.bty.blog.service.UserService;
 import org.omg.CORBA.PRIVATE_MEMBER;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientId;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.aop.interceptor.AsyncExecutionAspectSupport.DEFAULT_TASK_EXECUTOR_BEAN_NAME;
 
@@ -29,8 +37,9 @@ import static org.springframework.aop.interceptor.AsyncExecutionAspectSupport.DE
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final RoleService roleService;
-    private final UserRoleService userRoleService;
+    private final OAuth2ClientProperties properties;
+
+    private final Map<OAuth2AuthorizedClientId, OAuth2AuthorizedClient> authorizedClients = new HashMap<>();
 
     @Override
     public BlogUser getUserByUsername(String username) {
@@ -47,26 +56,30 @@ public class UserServiceImpl implements UserService {
         return new BlogUser();
     }
 
-    @Async(DEFAULT_TASK_EXECUTOR_BEAN_NAME)
+    // 仿照 InMemoryOAuth2AuthorizedClientService
     @Override
-    public void addUser(OAuth2AuthenticationToken token, OAuth2User oAuth2User) {
-
-        // 为每个第三方平台登录的创建一个角色，如ROLE_GITEE
-        String roleName = "ROLE_" + token.getAuthorizedClientRegistrationId().toUpperCase();
-        BlogRole role = roleService.getRoleByName(roleName);
-        if (role == null) {
-            Collection<? extends GrantedAuthority> authorities = oAuth2User.getAuthorities();
-            role = roleService.addRole(roleName, authorities.stream().map(GrantedAuthority::getAuthority).toArray(String[]::new));
+    public <T extends OAuth2AuthorizedClient> T loadAuthorizedClient(String clientRegistrationId, String principalName) {
+        Assert.hasText(clientRegistrationId, "clientRegistrationId cannot be empty");
+        Assert.hasText(principalName, "principalName cannot be empty");
+        OAuth2ClientProperties.Registration registration = properties.getRegistration().get(clientRegistrationId);
+        if(registration == null) {
+            return null;
         }
-
-        String username = oAuth2User.getName();
-        // 没有用户创建用户
-        BlogUser user = getUserByUsername(username);
-        if (user == null) {
-            user = addUser(username, null);
-        }
-        // 加入用户角色对应关系
-        userRoleService.addRolesForUser(user.getId(), role.getId());
+        return (T) this.authorizedClients.get(new OAuth2AuthorizedClientId(clientRegistrationId, principalName));
     }
+
+    @Override
+    public void saveAuthorizedClient(OAuth2AuthorizedClient authorizedClient, Authentication principal) {
+        Assert.notNull(authorizedClient, "authorizedClient cannot be null");
+        Assert.notNull(principal, "principal cannot be null");
+        this.authorizedClients.put(new OAuth2AuthorizedClientId(
+                authorizedClient.getClientRegistration().getRegistrationId(), principal.getName()), authorizedClient);
+    }
+
+    @Override
+    public void removeAuthorizedClient(String clientRegistrationId, String principalName) {
+        this.authorizedClients.remove(new OAuth2AuthorizedClientId(clientRegistrationId, principalName));
+    }
+
 
 }

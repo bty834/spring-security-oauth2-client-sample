@@ -2,6 +2,7 @@ package org.bty.blog.service;
 
 import org.bty.blog.entity.BlogUser;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -18,6 +19,11 @@ public interface UserService {
 
     BlogUser addUser(String username,String password);
 
-    void addUser(OAuth2AuthenticationToken token, OAuth2User oAuth2User);
+
+    <T extends OAuth2AuthorizedClient> T loadAuthorizedClient(String clientRegistrationId, String principalName);
+
+    void saveAuthorizedClient(OAuth2AuthorizedClient authorizedClient, Authentication principal);
+
+    void removeAuthorizedClient(String clientRegistrationId, String principalName);
 
 }

@@ -41,7 +41,7 @@ abstract public class BaseRestSuccessHandler implements AuthenticationSuccessHan
         String accessToken = tokenService.createAccessToken(o);
         String refreshToken = tokenService.createRefreshToken(o);
 
-        logger.info("accessToken: {} and refreshToken: {} for oauth2.0 login user {}", accessToken, refreshToken, o);
+        logger.info("accessToken: {} and refreshToken: {} for login user {}", accessToken, refreshToken, o);
 
         HashMap<String, String> body = new HashMap<>();
         body.put("accessToken", accessToken);

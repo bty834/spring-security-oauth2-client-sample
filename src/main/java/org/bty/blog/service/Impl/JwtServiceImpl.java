@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class JwtServiceImpl implements TokenService {
     private static final Logger logger = LoggerFactory.getLogger(JwtServiceImpl.class);
 
+    private static final String UUID_CLAIM = "uuid";
 
     @Value("${token.access-token-expire-minutes}")
     private Integer accessTokenExpireMinutes;
@@ -49,16 +50,16 @@ public class JwtServiceImpl implements TokenService {
 
     @Override
     public  String createAccessToken(SerializableToken user) throws RuntimeException{
-        String accessToken = UUID.randomUUID().toString();
-        tokenPersistProvider.persist(getAccessTokenRedisKey(accessToken),user,accessTokenExpireMinutes,TimeUnit.MINUTES);
-        return generateJwt("accessToken", accessToken, accessTokenExpireMinutes);
+        String uuid = UUID.randomUUID().toString();
+        tokenPersistProvider.persist(getAccessTokenRedisKey(uuid),user,accessTokenExpireMinutes,TimeUnit.MINUTES);
+        return generateJwt(UUID_CLAIM, uuid, accessTokenExpireMinutes);
     }
 
     @Override
     public String createRefreshToken(SerializableToken user) throws RuntimeException{
-        String refreshToken = UUID.randomUUID().toString();
-        tokenPersistProvider.persist(getRefreshTokenRedisKey(refreshToken),user,accessTokenExpireMinutes,TimeUnit.MINUTES);
-        return generateJwt("refreshToken", refreshToken, refreshTokenExpireMinutes);
+        String uuid = UUID.randomUUID().toString();
+        tokenPersistProvider.persist(getRefreshTokenRedisKey(uuid),user,accessTokenExpireMinutes,TimeUnit.MINUTES);
+        return generateJwt(UUID_CLAIM, uuid, refreshTokenExpireMinutes);
 
     }
 
@@ -70,6 +71,7 @@ public class JwtServiceImpl implements TokenService {
                 .expiresAt(now.plusSeconds(expireMinutes * 60))
                 .claim(name, token)
                 .build();
+
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
@@ -77,7 +79,7 @@ public class JwtServiceImpl implements TokenService {
     @Override
     public String refreshAccessToken(String jwt) throws RuntimeException{
         Jwt decode = jwtDecoder.decode(jwt);
-        String refreshToken = decode.getClaim("refreshToken");
+        String refreshToken = decode.getClaim(UUID_CLAIM);
         SerializableToken user = tokenPersistProvider.get(getRefreshTokenRedisKey(refreshToken),refreshTokenExpireMinutes,TimeUnit.MINUTES);
         return createAccessToken(user);
     }
@@ -86,15 +88,15 @@ public class JwtServiceImpl implements TokenService {
     @Override
     public SerializableToken verifyAccessToken(String jwt) throws RuntimeException{
         Jwt decode = jwtDecoder.decode(jwt);
-        String accessToken = decode.getClaim("accessToken");
-        return tokenPersistProvider.get(getAccessTokenRedisKey(accessToken),accessTokenExpireMinutes,TimeUnit.MINUTES);
+        String uuid = decode.getClaim(UUID_CLAIM);
+        return tokenPersistProvider.get(getAccessTokenRedisKey(uuid),accessTokenExpireMinutes,TimeUnit.MINUTES);
     }
 
     @Override
     public void invalidToken(String jwt) throws RuntimeException {
         Jwt decode = jwtDecoder.decode(jwt);
-        String accessToken = decode.getClaim("accessToken");
-        tokenPersistProvider.invalid(getAccessTokenRedisKey(accessToken));
+        String uuid = decode.getClaim(UUID_CLAIM);
+        tokenPersistProvider.invalid(getAccessTokenRedisKey(uuid));
     }
 
 

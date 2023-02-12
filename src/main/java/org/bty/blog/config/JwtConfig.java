@@ -26,6 +26,9 @@ import java.security.interfaces.RSAPublicKey;
 public class JwtConfig {
 
 
+    // 关于publickey的获取，可以直接放在jwt的header中的jwk字段
+    // 或者在jwt的header中的jku字段放置获取jwk的uri,该地址必须TLS加密
+    // 具体可参考rfc 7515 / rfc 7517 / rfc 7519
     @Value("${token.key.public}")
     RSAPublicKey key;
 
