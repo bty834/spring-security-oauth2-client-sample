@@ -4,9 +4,7 @@ import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import org.bty.blog.service.TokenService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -23,8 +21,8 @@ public class TokenController {
 
     private final TokenService tokenService;
 
-    @GetMapping("/refresh")
-    public ResponseEntity<Map<String, Object>> refresh(String refreshToken) {
+    @PostMapping("/refresh")
+    public ResponseEntity<Map<String, Object>> refresh(@RequestBody String refreshToken) {
 
         if(Strings.isNullOrEmpty(refreshToken)){
             return ResponseEntity.ok(Collections.singletonMap("msg","no refreshToken or invalid refreshToken"));

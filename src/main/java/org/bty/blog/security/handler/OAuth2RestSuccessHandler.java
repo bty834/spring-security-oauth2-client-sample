@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,10 +21,10 @@ import java.io.IOException;
  * @author bty
  * @date 2022/10/3
  * @since 1.8
- * 第三方Oauth2.0 gitee登录成功时的处理
+ * 第三方Oauth2.0 gitee登录成功时的处理，omit test
  **/
-@Component("oAuth2RestSuccessHandler")
-public class OAuth2RestSuccessHandler extends BaseLoginRestSuccessHandler {
+//@Component("oAuth2RestSuccessHandler")
+public class OAuth2RestSuccessHandler extends BaseRestSuccessHandler {
 
 
     private static final Logger logger = LoggerFactory.getLogger(OAuth2RestSuccessHandler.class);

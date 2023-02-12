@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.bty.blog.service.CaptchaService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -38,13 +39,13 @@ public class CaptchaVerifyFilter extends OncePerRequestFilter {
         }
         try {
             verifyCaptcha(request,response);
+            // 成功之后继续
+            filterChain.doFilter(request,response);
         } catch (AuthenticationException e) {
+            SecurityContextHolder.clearContext();
             // 错误直接返回
             failureHandler.onAuthenticationFailure(request,response,e);
-            return;
         }
-        // 成功之后继续
-        filterChain.doFilter(request,response);
     }
 
     public void verifyCaptcha(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {

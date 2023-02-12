@@ -31,7 +31,7 @@ import java.io.IOException;
  * @date 2023/2/6
  * @since 1.8
  **/
-@Component
+
 public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(BearerTokenAuthenticationFilter.class);

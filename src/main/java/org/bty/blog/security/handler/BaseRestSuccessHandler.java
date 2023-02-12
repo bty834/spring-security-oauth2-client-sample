@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.servlet.ServletException;
@@ -22,12 +21,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  * @date 2023/2/6
  * @since 1.8
  **/
-abstract public class BaseLoginRestSuccessHandler implements AuthenticationSuccessHandler {
-    private static final Logger logger = LoggerFactory.getLogger(BaseLoginRestSuccessHandler.class);
+abstract public class BaseRestSuccessHandler implements AuthenticationSuccessHandler {
+    private static final Logger logger = LoggerFactory.getLogger(BaseRestSuccessHandler.class);
 
     private final TokenService tokenService;
 
-    public BaseLoginRestSuccessHandler(TokenService tokenService) {
+    public BaseRestSuccessHandler(TokenService tokenService) {
         this.tokenService = tokenService;
     }
 

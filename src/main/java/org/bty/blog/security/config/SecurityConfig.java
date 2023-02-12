@@ -8,6 +8,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
 
+import org.bty.blog.security.converter.BearerTokenResolver;
 import org.bty.blog.security.filter.BearerTokenAuthenticationFilter;
 import org.bty.blog.security.filter.CaptchaVerifyFilter;
 import org.bty.blog.security.handler.*;
@@ -15,6 +16,7 @@ import org.bty.blog.service.CaptchaService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -30,6 +32,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.web.cors.CorsConfiguration;
@@ -80,9 +83,9 @@ public class SecurityConfig {
     };
 
 
-    private final RestSuccessHandler restSuccessHandler;
     private final AuthenticationFailureHandler restFailureHandler;
-    private final OAuth2RestSuccessHandler oAuth2SuccessHandler;
+
+    private final AuthenticationSuccessHandler restSuccessHandler;
 
     private final CaptchaService captchaService;
 
@@ -93,8 +96,9 @@ public class SecurityConfig {
     private final AccessDeniedHandler restAccessDeniedHandler;
     private final AuthenticationEntryPoint restAuthenticationEntrypoint;
 
-    private final BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter;
+    private final BearerTokenResolver bearerTokenResolver;
 
+    private final AuthenticationManager jwtAuthenticationManager;
     /**
      * 注意，在
      *
@@ -182,7 +186,7 @@ public class SecurityConfig {
         // OAuth2LoginAuthenticationProvider 中有个 OAuth2AuthorizationCodeAuthenticationProvider ，后者专门用于 code换取accessToken操作
         // OAuth2LoginAuthenticationProvider在OAuth2AuthorizationCodeAuthenticationProvider 获取到accessToken基础上执行 accessToken换取资源信息操作
         http.oauth2Login()
-                .successHandler(oAuth2SuccessHandler)
+                .successHandler(restSuccessHandler)
                 .failureHandler(restFailureHandler)
 // TODO
 //                // 开始认证访问的地址，获取authorization 的 url，一般通过yaml配置
@@ -214,7 +218,7 @@ public class SecurityConfig {
 //                );
 
         // extract bearer token to verify if the user has logged in
-        http.addFilterBefore(bearerTokenAuthenticationFilter, OAuth2AuthorizationRequestRedirectFilter.class);
+        http.addFilterBefore(new BearerTokenAuthenticationFilter(restAuthenticationEntrypoint,bearerTokenResolver,jwtAuthenticationManager,restFailureHandler), OAuth2AuthorizationRequestRedirectFilter.class);
 
         // username password登录之前先校验captcha
         http.addFilterBefore(new CaptchaVerifyFilter(loginUri,captchaService,restFailureHandler), UsernamePasswordAuthenticationFilter.class);

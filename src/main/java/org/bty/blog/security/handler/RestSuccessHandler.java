@@ -21,8 +21,8 @@ import java.io.IOException;
  * <p>
  * 普通用户名密码登录成功时的处理，记录登录状态并返回jwt
  **/
-@Component("restSuccessHandler")
-public class RestSuccessHandler extends BaseLoginRestSuccessHandler {
+@Component
+public class RestSuccessHandler extends BaseRestSuccessHandler {
     private static final Logger logger = LoggerFactory.getLogger(RestSuccessHandler.class);
 
     public RestSuccessHandler(TokenService tokenService) {

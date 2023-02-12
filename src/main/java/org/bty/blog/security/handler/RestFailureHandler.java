@@ -1,6 +1,8 @@
 package org.bty.blog.security.handler;
 
 import org.bty.blog.util.JacksonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -22,9 +24,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  **/
 @Component
 public class RestFailureHandler implements AuthenticationFailureHandler {
+    private static final Logger logger = LoggerFactory.getLogger(RestFailureHandler.class);
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+        logger.error(exception.getMessage());
         response.setContentType(APPLICATION_JSON_UTF8_VALUE);
         response.getWriter().write(
                 JacksonUtil.getObjectMapper().writeValueAsString(
