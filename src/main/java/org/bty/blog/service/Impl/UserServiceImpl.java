@@ -18,6 +18,8 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientId;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -37,7 +39,7 @@ import static org.springframework.aop.interceptor.AsyncExecutionAspectSupport.DE
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final OAuth2ClientProperties properties;
+    private final ClientRegistrationRepository registrationRepository;
 
     private final Map<OAuth2AuthorizedClientId, OAuth2AuthorizedClient> authorizedClients = new HashMap<>();
 
@@ -61,7 +63,7 @@ public class UserServiceImpl implements UserService {
     public <T extends OAuth2AuthorizedClient> T loadAuthorizedClient(String clientRegistrationId, String principalName) {
         Assert.hasText(clientRegistrationId, "clientRegistrationId cannot be empty");
         Assert.hasText(principalName, "principalName cannot be empty");
-        OAuth2ClientProperties.Registration registration = properties.getRegistration().get(clientRegistrationId);
+        ClientRegistration registration = registrationRepository.findByRegistrationId(clientRegistrationId);
         if(registration == null) {
             return null;
         }
