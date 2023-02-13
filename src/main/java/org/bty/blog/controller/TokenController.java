@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public class TokenController {
 
     private final TokenService tokenService;
+    private final List<JWK> jwkList;
 
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, Object>> refresh(@RequestBody String refreshToken) {
@@ -40,7 +41,6 @@ public class TokenController {
     }
 
 
-    private final List<JWK> jwkList;
 
     /**
      * 获取JWK校验JWT的api <br/>

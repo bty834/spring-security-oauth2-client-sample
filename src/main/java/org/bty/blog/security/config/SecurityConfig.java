@@ -24,6 +24,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -107,6 +108,7 @@ public class SecurityConfig {
 
     private final AuthenticationManager jwtAuthenticationManager;
 
+    private final AuthorizationRequestRepository authorizationRequestRepository;
 
     private final LogoutSuccessHandler logoutSuccessHandler;
     private final LogoutHandler logoutHandler;
@@ -168,6 +170,7 @@ public class SecurityConfig {
         http.sessionManagement().sessionAuthenticationStrategy(customSessionAuthenticationStrategy);
 
 
+
         http.exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
         http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntrypoint);
         // TODO http.securityContext().securityContextRepository(...);
@@ -199,6 +202,9 @@ public class SecurityConfig {
         // OAuth2LoginAuthenticationFilter 通过 OAuth2LoginAuthenticationProvider 执行 操作
         // OAuth2LoginAuthenticationProvider 中有个 OAuth2AuthorizationCodeAuthenticationProvider ，后者专门用于 code换取accessToken操作
         // OAuth2LoginAuthenticationProvider在OAuth2AuthorizationCodeAuthenticationProvider 获取到accessToken基础上执行 accessToken换取资源信息操作
+        http.oauth2Login()
+                .authorizationEndpoint()
+                .authorizationRequestRepository(authorizationRequestRepository) ;
         http.oauth2Login()
                 .successHandler(restSuccessHandler)
                 .failureHandler(restFailureHandler)
