@@ -34,9 +34,10 @@ public class TokenController {
 
     /**
      * refresh token , 参照OAuth2规范 <br/>
-     * 地址：<a href="https://www.rfc-editor.org/rfc/rfc6749#page-47">rfc6749: Refreshing an Access Token</a>
+     * 地址：<a href="https://www.rfc-editor.org/rfc/rfc6749#page-47">rfc6749: Refreshing an Access Token</a> <br/>
+     * 参数形式为: x-www-form-urlencoded
      * @param refreshToken
-     * @param grantType
+     * @param grantType 必须为 refresh_token
      * @return
      */
     @PostMapping("/refresh")

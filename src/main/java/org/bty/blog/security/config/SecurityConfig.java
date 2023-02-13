@@ -202,13 +202,16 @@ public class SecurityConfig {
         // OAuth2LoginAuthenticationFilter 通过 OAuth2LoginAuthenticationProvider 执行 操作
         // OAuth2LoginAuthenticationProvider 中有个 OAuth2AuthorizationCodeAuthenticationProvider ，后者专门用于 code换取accessToken操作
         // OAuth2LoginAuthenticationProvider在OAuth2AuthorizationCodeAuthenticationProvider 获取到accessToken基础上执行 accessToken换取资源信息操作
+
+        // 拿取code的uri模式默认为：/oauth2/authorization/{registration_id}
+        // code换取accessToken和refreshToken的uri模式默认为：/login/oauth2/code/{registration_id}
         http.oauth2Login()
                 .authorizationEndpoint()
                 .authorizationRequestRepository(authorizationRequestRepository) ;
         http.oauth2Login()
                 .successHandler(restSuccessHandler)
                 .failureHandler(restFailureHandler)
-// TODO
+//
 //                // 开始认证访问的地址，获取authorization 的 url，一般通过yaml配置
 //                .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig.baseUri("url"))
 //                // 授权服务器 返回authorization_code的回调地址一般通过yaml配置
