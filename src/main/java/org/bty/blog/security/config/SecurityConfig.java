@@ -232,7 +232,6 @@ public class SecurityConfig {
                 .and()
                 .authorizedClientService(daoOAuth2AuthorizedClientService);
 
-
         http.logout()
                 .logoutUrl(logoutUri)
                 .addLogoutHandler(logoutHandler)
