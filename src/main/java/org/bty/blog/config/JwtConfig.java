@@ -1,8 +1,6 @@
 package org.bty.blog.config;
 
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -17,6 +15,7 @@ import sun.security.rsa.RSAPublicKeyImpl;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -42,14 +41,33 @@ public class JwtConfig {
         return NimbusJwtDecoder.withPublicKey(this.key).build();
     }
 
+    /**
+     * only for verify
+     * @return
+     */
     @Bean
     public JWK jwk(){
-        return new RSAKey.Builder(this.key).privateKey(this.priv).build();
+        HashSet<KeyOperation> set = new HashSet<>();
+        set.add(KeyOperation.VERIFY);
+        return new RSAKey.Builder(this.key)
+                .keyUse(KeyUse.SIGNATURE)
+                .keyOperations(set)
+                .keyID(String.valueOf(System.currentTimeMillis()))
+                .build();
     }
 
     @Bean
-    public JwtEncoder jwtEncoder(List<JWK> jwkList) {
-        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwkList));
+    public JwtEncoder jwtEncoder() {
+        // sign
+        HashSet<KeyOperation> set = new HashSet<>();
+        set.add(KeyOperation.SIGN);
+        RSAKey key = new RSAKey.Builder(this.key)
+                .privateKey(this.priv)
+                .keyUse(KeyUse.SIGNATURE)
+                .keyOperations(set)
+                .keyID(String.valueOf(System.currentTimeMillis()))
+                .build();
+        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(key));
         return new NimbusJwtEncoder(jwks);
     }
 
