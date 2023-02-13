@@ -13,9 +13,11 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import sun.security.rsa.RSAPublicKeyImpl;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
 
 /**
  * @author bty
@@ -36,14 +38,20 @@ public class JwtConfig {
     RSAPrivateKey priv;
 
     @Bean
-    JwtDecoder jwtDecoder() {
+    public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(this.key).build();
     }
 
     @Bean
-    JwtEncoder jwtEncoder() {
-        JWK jwk = new RSAKey.Builder(this.key).privateKey(this.priv).build();
-        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+    public JWK jwk(){
+        return new RSAKey.Builder(this.key).privateKey(this.priv).build();
+    }
+
+    @Bean
+    public JwtEncoder jwtEncoder(List<JWK> jwkList) {
+        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwkList));
         return new NimbusJwtEncoder(jwks);
     }
+
+
 }

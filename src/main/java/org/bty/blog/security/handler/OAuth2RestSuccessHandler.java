@@ -49,12 +49,6 @@ import java.io.IOException;
 //     */
 //    @Override
 //    public SerializableToken handlerLogin(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-//        OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
-//        OAuth2User oAuth2User = token.getPrincipal();
-//
-//        // async，可在DaoOAuth2AuthorizedClientService中完成该工作
-//        userService.addUser(token, oAuth2User);
-//
 //        return ...;
 //    }
 //}
