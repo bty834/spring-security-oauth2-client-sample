@@ -21,6 +21,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -57,7 +58,6 @@ import java.util.Collections;
 @EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
-
 
 
     @Value("${login.uri}")
@@ -110,11 +110,14 @@ public class SecurityConfig {
 
     private final AuthorizationRequestRepository authorizationRequestRepository;
 
+    private final GrantedAuthoritiesMapper grantedAuthoritiesMapper;
+
     private final LogoutSuccessHandler logoutSuccessHandler;
     private final LogoutHandler logoutHandler;
 
     @Value("${captcha.enabled}")
     private boolean captchaEnabled;
+
     /**
      * 注意，在
      *
@@ -149,7 +152,7 @@ public class SecurityConfig {
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 // 剩下的需要认证
                 .anyRequest().authenticated();
-                // denyAll慎用
+        // denyAll慎用
 //                .anyRequest().denyAll();
 
 //        http.authorizeHttpRequests()
@@ -168,7 +171,6 @@ public class SecurityConfig {
         // 5. ApplicationEventPublisher#publishEvent
         // 6. AuthenticationSuccessHandler#onAuthenticationSuccess
         http.sessionManagement().sessionAuthenticationStrategy(customSessionAuthenticationStrategy);
-
 
 
         http.exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
@@ -207,25 +209,27 @@ public class SecurityConfig {
         // code换取accessToken和refreshToken的uri模式默认为：/login/oauth2/code/{registration_id}
         http.oauth2Login()
                 .authorizationEndpoint()
-                .authorizationRequestRepository(authorizationRequestRepository) ;
+                .authorizationRequestRepository(authorizationRequestRepository);
         http.oauth2Login()
                 .successHandler(restSuccessHandler)
                 .failureHandler(restFailureHandler)
-//
-//                // 开始认证访问的地址，获取authorization 的 url，一般通过yaml配置
-//                .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig.baseUri("url"))
-//                // 授权服务器 返回authorization_code的回调地址一般通过yaml配置
-//                .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig.baseUri("url"))
-//                // authorization_code 交换accessToken的 url ,一般通过yaml配置
-//                .tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient())
-//                // 获取用户授权信息，一般通过yaml配置
-//                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService())
+                // 开始认证，默认 /oauth2/authorization/{registration_id} 不要带后面{}的东西
+                .authorizationEndpoint().baseUri("/oauth2/auth")
+                .and()
+                // 后端接受code的地址，拿到code去换accessToken和userInfo，默认 /login/oauth2/code/* 星号不能省略，使用AntMatch，参见 AbstractAuthenticationProcessingFilter#setFilterProcessesUrl
+                .redirectionEndpoint().baseUri("/login/oauth2/code/*")
+//                .and()
+//                .tokenEndpoint().accessTokenResponseClient() //
+//                .and()
+//                .userInfoEndpoint().userAuthoritiesMapper().userService()
+
 //                // 针对认证成功的用户，调用OAuth2AuthorizedClientRepository的
 //                // 默认实现类AuthenticatedPrincipalOAuth2AuthorizedClientRepository中的
 //                // OAuth2AuthorizedClientService (默认Inmemory)存储
 //                // 否则
 //                // 匿名存储调用OAuth2AuthorizedClientRepository的另一个实现类用session存储
 //                .authorizedClientRepository(...)
+                .and()
                 .authorizedClientService(daoOAuth2AuthorizedClientService);
 
 
@@ -237,7 +241,7 @@ public class SecurityConfig {
 
         // extract bearer token to verify if the user has logged in
         // before logout filter, to logout needs user logged in
-        http.addFilterBefore(new BearerTokenAuthenticationFilter(restAuthenticationEntrypoint,bearerTokenResolver,jwtAuthenticationManager,restFailureHandler), OAuth2AuthorizationRequestRedirectFilter.class);
+        http.addFilterBefore(new BearerTokenAuthenticationFilter(restAuthenticationEntrypoint, bearerTokenResolver, jwtAuthenticationManager, restFailureHandler), OAuth2AuthorizationRequestRedirectFilter.class);
 
 
         CaptchaVerifyFilter captchaVerifyFilter = new CaptchaVerifyFilter(loginUri, captchaService, restFailureHandler);
@@ -264,8 +268,6 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
 
 
 }
