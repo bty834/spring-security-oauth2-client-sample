@@ -1,0 +1,91 @@
+server:
+  port: 8080
+token:
+  issuer: bty
+  access-token-expire-minutes: 30
+  refresh-token-expire-minutes: 3000
+#  关于publickey的获取，可以直接放在jwt的header中的jwk字段
+#  或者在jwt的header中的jku字段放置获取jwk的uri,该地址必须TLS加密
+#  具体可参考rfc 7515 / rfc 7517 / rfc 7519
+  key:
+    private: classpath:app.key
+    public: classpath:app.pub
+
+
+spring:
+  mvc:
+    # 必须添加否则swagger2会报错
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  redis:
+    port: 6379
+    host: localhost
+  security:
+    oauth2:
+      client:
+        registration:
+          # google facebook github okta的provider默认提供
+          # 参见 org.springframework.security.config.oauth2.client.CommonOAuth2Provider
+          # 国内访问容易超时
+          google:
+            authorization-grant-type: authorization_code
+            scope:
+              - openid
+              - profile
+            client-id:
+            client-secret:
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
+          # 不支持openid
+          github:
+            authorization-grant-type: authorization_code
+            scope:
+              - profile
+            client-id:
+            client-secret:
+            redirect-uri: http://localhost:8080/login/oauth2/code/github
+          # 不支持openid
+          gitee:
+            provider: gitee
+            authorization-grant-type: authorization_code
+            scope:
+              - user_info
+              - emails
+            client-id:
+            client-secret:
+
+            # 这儿是把code传到前端，前端再把code和state参数给后端
+            # 这里填写的是前端的地址，后端Spring Security接受code默认pattern /login/oauth2/code/{registration_id}
+            redirect-uri: http://localhost:8080/login/oauth2/code/gitee
+            client-name: gitee
+          test:
+            provider: test
+            authorization-grant-type: authorization_code
+            scope:
+              - profile
+            client-id: test
+            client-secret: test123
+            redirect-uri: http://localhost:8080/login/oauth2/code/test
+        provider:
+          # gitee第三方授权文档 https://gitee.com/api/v5/oauth_doc#/
+          gitee:
+            # 访问以下地址后重定向到授权页面，授权后返回给redirect_uri一个code和state参数。重定向的uri：https://gitee.com/oauth/authorize?response_type=code&client_id=id&scope=user_info%20emails&state=state&redirect_uri=http://localhost:8080/login/oauth2/code/gitee
+            authorization-uri: https://gitee.com/oauth/authorize
+            # code获取accessToken和refreshToken格式 POST：https://gitee.com/oauth/token x-www-form-urlencoded 请求体：grant_type=authorization_code&code=code&redirect_uri=uri&client_id=id&client_secret=secret
+            # client secret 可以通过url、body、header三种方式传递，不建议url，在OAuth2.1中不允许用url编码
+            # refreshToken重新获取accessToken格式 POST：https://gitee.com/oauth/token x-www-form-urlencoded 请求体： grant_type=refresh_token&refresh_token=token
+            token-uri: https://gitee.com/oauth/token
+            user-info-uri: https://gitee.com/api/v5/user
+            # 注意，这里的user-name-attribute指的是每个平台用户名的key的名字，每个平台不一样的，gitee是name，所以这里写name
+            user-name-attribute: name
+          test:
+            authorization-uri: http://localhost:9090/oauth2/authorize
+            token-uri: http://localhost:9090/oauth2/token
+
+# swagger-bootstrap-ui
+knife4j:
+  enable: true
+  production: false
+  basic:
+    enable: true
+    username: bty
+    password: 123456
