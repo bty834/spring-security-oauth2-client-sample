@@ -43,7 +43,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.context.NullSecurityContextRepository;
+import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -102,7 +105,6 @@ public class SecurityConfig {
 
     private final OAuth2AuthorizedClientService daoOAuth2AuthorizedClientService;
 
-    private final SessionAuthenticationStrategy customSessionAuthenticationStrategy;
 
     private final AccessDeniedHandler restAccessDeniedHandler;
     private final AuthenticationEntryPoint restAuthenticationEntrypoint;
@@ -176,8 +178,11 @@ public class SecurityConfig {
         // 4. RememberMeServices#loginSuccess
         // 5. ApplicationEventPublisher#publishEvent
         // 6. AuthenticationSuccessHandler#onAuthenticationSuccess
-        http.sessionManagement().sessionAuthenticationStrategy(customSessionAuthenticationStrategy);
 
+        // use token, invalidate session
+        http.sessionManagement().sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy());
+        // use redis to store security context, invalidate this repository
+        http.securityContext().securityContextRepository(new NullSecurityContextRepository());
 
         http.exceptionHandling().accessDeniedHandler(restAccessDeniedHandler);
         http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntrypoint);
@@ -248,7 +253,11 @@ public class SecurityConfig {
 
         // extract bearer token to verify if the user has logged in
         // before logout filter, to logout needs user logged in
-        http.addFilterBefore(new BearerTokenAuthenticationFilter(restAuthenticationEntrypoint, bearerTokenResolver, jwtAuthenticationManager, restFailureHandler), OAuth2AuthorizationRequestRedirectFilter.class);
+        http.addFilterBefore(
+                new BearerTokenAuthenticationFilter(restAuthenticationEntrypoint, bearerTokenResolver, jwtAuthenticationManager, restFailureHandler),
+//                OAuth2AuthorizationRequestRedirectFilter.class
+                SessionManagementFilter.class
+                );
 
 
         CaptchaVerifyFilter captchaVerifyFilter = new CaptchaVerifyFilter(loginUri, captchaService, restFailureHandler);
