@@ -7,6 +7,8 @@ import org.bty.blog.service.RoleService;
 import org.bty.blog.service.UserRoleService;
 import org.bty.blog.service.UserService;
 import org.omg.CORBA.PRIVATE_MEMBER;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
@@ -38,6 +40,7 @@ import static org.springframework.aop.interceptor.AsyncExecutionAspectSupport.DE
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    public static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final ClientRegistrationRepository registrationRepository;
 
@@ -55,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public BlogUser addUser(String username, String password) {
         // TODO: add user in database
-        return new BlogUser();
+        return new BlogUser(0,username,password);
     }
 
     // 仿照 InMemoryOAuth2AuthorizedClientService

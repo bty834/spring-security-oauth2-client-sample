@@ -13,15 +13,18 @@ import org.bty.blog.security.converter.BearerTokenResolver;
 import org.bty.blog.security.filter.BearerTokenAuthenticationFilter;
 import org.bty.blog.security.filter.CaptchaVerifyFilter;
 import org.bty.blog.security.handler.*;
+import org.bty.blog.security.model.CustomPasswordEncoder;
 import org.bty.blog.service.CaptchaService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -115,6 +118,7 @@ public class SecurityConfig {
     private final LogoutSuccessHandler logoutSuccessHandler;
     private final LogoutHandler logoutHandler;
 
+
     @Value("${captcha.enabled}")
     private boolean captchaEnabled;
 
@@ -147,6 +151,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .antMatchers("/token/**").permitAll()
+//                //访问 /.well-known/change-password 默认重定向到 /change-password
+//                .antMatchers("/**/change-password").permitAll()
                 // hasRole中不需要添加 ROLE_前缀
                 // ant 匹配 /admin /admin/a /admin/a/b 都会匹配上
                 .antMatchers("/admin/**").hasRole("ADMIN")
@@ -189,6 +195,8 @@ public class SecurityConfig {
                 .successHandler(restSuccessHandler)
                 .failureHandler(restFailureHandler);
 //                        .securityContextRepository()  // pass
+
+//        http.userDetailsService(userDetailsService); // 只需将自定义userDetailsService注入容器，这行可以不写
 
 
         // OAuth2AuthorizationRequestRedirectFilter:
@@ -265,7 +273,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new CustomPasswordEncoder();
     }
 
 

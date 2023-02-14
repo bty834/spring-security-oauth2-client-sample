@@ -9,4 +9,6 @@ public interface PermissionService {
 
 
     String[] getPermissionsByUserId(Integer userId);
+
+    void setPermission(Integer userId,String[] permissions);
 }

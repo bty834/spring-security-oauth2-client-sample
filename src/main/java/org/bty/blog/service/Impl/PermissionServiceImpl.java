@@ -14,4 +14,9 @@ public class PermissionServiceImpl implements PermissionService {
     public String[] getPermissionsByUserId(Integer userId) {
         return new String[]{"read","write","execute"};
     }
+
+    @Override
+    public void setPermission(Integer userId, String[] permissions) {
+
+    }
 }

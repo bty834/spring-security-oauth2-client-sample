@@ -13,9 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
@@ -33,6 +32,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
 
+
+    private final UserDetailsManager manager;
 
     /**
      * 必须登录才能访问
@@ -54,8 +55,6 @@ public class UserController {
 
         return ResponseEntity.ok(Collections.singletonMap("msg","u r admin"));
     }
-
-
 
 
 }

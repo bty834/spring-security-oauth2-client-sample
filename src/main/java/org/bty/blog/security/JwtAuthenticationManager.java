@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.stereotype.Component;
 
 /**
- * 用于BearerToken的认证，具体由{@link TokenService}实现
+ * 用于BearerToken的认证，具体由{@link TokenService}实现 <br/>
  *
  * @author bty
  * @date 2023/2/6
