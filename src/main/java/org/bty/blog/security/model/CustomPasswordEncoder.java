@@ -1,7 +1,6 @@
 package org.bty.blog.security.model;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

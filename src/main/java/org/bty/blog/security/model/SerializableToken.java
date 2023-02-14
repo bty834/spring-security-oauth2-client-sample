@@ -8,7 +8,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.io.Serializable;
 import java.util.*;
@@ -34,8 +36,26 @@ public class SerializableToken implements Serializable {
 
     private List<String> authorities;
 
+    private Map<String, Object> idToken;
+    private Map<String, Object> userInfo;
 
     public SerializableToken() {
+    }
+
+    public Map<String, Object> getIdToken() {
+        return idToken;
+    }
+
+    public void setIdToken(Map<String, Object> idToken) {
+        this.idToken = idToken;
+    }
+
+    public Map<String, Object> getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(Map<String, Object> userInfo) {
+        this.userInfo = userInfo;
     }
 
     public Map<String, Object> getAttributes() {
@@ -93,14 +113,21 @@ public class SerializableToken implements Serializable {
         if (authentication instanceof OAuth2AuthenticationToken) {
             OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
             serializableToken = new SerializableToken();
-            serializableToken.setLoginType(LOGIN_TYPE.OAUTH2);
             serializableToken.setUsername(token.getName());
             serializableToken.setAuthorities(authorityList);
             serializableToken.setRegistrationId(token.getAuthorizedClientRegistrationId());
 
-            DefaultOAuth2User user = (DefaultOAuth2User) token.getPrincipal();
-            serializableToken.setAttributes(user.getAttributes());
+            OAuth2User principal = token.getPrincipal();
+            if(principal instanceof OidcUser){
+                serializableToken.setLoginType(LOGIN_TYPE.OIDC);
+                serializableToken.setIdToken(((OidcUser) principal).getIdToken().getClaims());
+                serializableToken.setUserInfo(((OidcUser) principal).getUserInfo().getClaims());
+                serializableToken.setAttributes(principal.getAttributes());
 
+            } else{
+                serializableToken.setLoginType(LOGIN_TYPE.OAUTH2);
+                serializableToken.setAttributes(principal.getAttributes());
+            }
         }
         return serializableToken;
     }
