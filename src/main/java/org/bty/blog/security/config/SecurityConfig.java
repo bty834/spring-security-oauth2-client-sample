@@ -256,7 +256,7 @@ public class SecurityConfig {
         http.addFilterBefore(
                 new BearerTokenAuthenticationFilter(restAuthenticationEntrypoint, bearerTokenResolver, jwtAuthenticationManager, restFailureHandler),
 //                OAuth2AuthorizationRequestRedirectFilter.class
-                SessionManagementFilter.class
+                OAuth2AuthorizationRequestRedirectFilter.class
                 );
 
 

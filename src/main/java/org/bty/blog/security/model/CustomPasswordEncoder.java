@@ -39,6 +39,8 @@ public class CustomPasswordEncoder extends BCryptPasswordEncoder {
 
     public static void main(String[] args) {
         System.out.println(encodeBase64Password("123456"));
+        System.out.println(encodeBase64Password("test123"));
+
     }
 
 }
