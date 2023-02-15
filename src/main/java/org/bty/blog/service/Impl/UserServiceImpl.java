@@ -26,6 +26,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,12 +46,15 @@ public class UserServiceImpl implements UserService {
 
     private final ClientRegistrationRepository registrationRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
     private final Map<OAuth2AuthorizedClientId, OAuth2AuthorizedClient> authorizedClients = new HashMap<>();
 
     @Override
     public BlogUser getUserByUsername(String username) {
 
-        String encode = new BCryptPasswordEncoder().encode("123456");
+
+        String encode = passwordEncoder.encode("123456") ;
         if(username.equals("bty"))
             return new BlogUser(1,"bty",encode);
         return new BlogUser(0, "nobody", "");

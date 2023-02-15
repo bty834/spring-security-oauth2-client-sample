@@ -55,6 +55,12 @@ public class JwtServiceImpl implements TokenService {
         return generateJwt(UUID_CLAIM, uuid, accessTokenExpireMinutes);
     }
 
+    /**
+     * refreshToken可以不为jwt，uuid就可以
+     * @param user
+     * @return
+     * @throws RuntimeException
+     */
     @Override
     public String createRefreshToken(SerializableToken user) throws RuntimeException{
         String uuid = UUID.randomUUID().toString();
@@ -65,6 +71,7 @@ public class JwtServiceImpl implements TokenService {
 
     private String generateJwt(String name, String token, Integer expireMinutes) {
         Instant now = Instant.now();
+
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(issuer)
                 .issuedAt(now)

@@ -8,18 +8,17 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
 
-import org.bty.blog.config.CaptchaProperties;
+
 import org.bty.blog.security.converter.BearerTokenResolver;
 import org.bty.blog.security.filter.BearerTokenAuthenticationFilter;
 import org.bty.blog.security.filter.CaptchaVerifyFilter;
-import org.bty.blog.security.handler.*;
-import org.bty.blog.security.model.CustomPasswordEncoder;
+
 import org.bty.blog.service.CaptchaService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
+
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -115,7 +114,6 @@ public class SecurityConfig {
 
     private final AuthorizationRequestRepository authorizationRequestRepository;
 
-    private final GrantedAuthoritiesMapper grantedAuthoritiesMapper;
 
     private final LogoutSuccessHandler logoutSuccessHandler;
     private final LogoutHandler logoutHandler;
@@ -278,11 +276,6 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         // 仅仅作为演示
         return (web) -> web.ignoring().antMatchers(AUTH_WHITELIST);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new CustomPasswordEncoder();
     }
 
 
