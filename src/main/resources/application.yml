@@ -1,8 +1,14 @@
+server:
+  port: 8080
 spring:
   profiles:
     active: dev
-
-
+  application:
+    name: oauth2-client
+  mvc:
+    # 必须添加否则swagger2会报错
+    pathmatch:
+      matching-strategy: ant_path_matcher
 captcha:
   enabled: false
   border: false
@@ -19,3 +25,16 @@ login:
 
 logout:
   uri: /logout
+
+token:
+  access-token-expire-minutes: 30
+  refresh-token-expire-minutes: 3000
+
+# swagger-bootstrap-ui
+knife4j:
+  enable: true
+  production: false
+  basic:
+    enable: true
+    username: bty
+    password: 123456

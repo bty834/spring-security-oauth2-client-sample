@@ -32,8 +32,6 @@ public class JwtServiceImpl implements TokenService {
     @Value("${token.refresh-token-expire-minutes}")
     private Integer refreshTokenExpireMinutes;
 
-    @Value("${token.issuer}")
-    private String issuer;
 
     private final TokenPersistProvider tokenPersistProvider;
 
@@ -73,7 +71,7 @@ public class JwtServiceImpl implements TokenService {
         Instant now = Instant.now();
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer(issuer)
+//                .issuer()
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expireMinutes * 60))
                 .claim(name, token)

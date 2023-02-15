@@ -1,22 +1,5 @@
-server:
-  port: 8080
-token:
-  issuer: bty
-  access-token-expire-minutes: 30
-  refresh-token-expire-minutes: 3000
-#  关于publickey的获取，可以直接放在jwt的header中的jwk字段
-#  或者在jwt的header中的jku字段放置获取jwk的uri,该地址必须TLS加密
-#  具体可参考rfc 7515 / rfc 7517 / rfc 7519
-  key:
-    private: classpath:app.key
-    public: classpath:app.pub
-
 
 spring:
-  mvc:
-    # 必须添加否则swagger2会报错
-    pathmatch:
-      matching-strategy: ant_path_matcher
   redis:
     port: 6379
     host: localhost
@@ -81,11 +64,4 @@ spring:
             authorization-uri: http://localhost:9090/oauth2/authorize
             token-uri: http://localhost:9090/oauth2/token
 
-# swagger-bootstrap-ui
-knife4j:
-  enable: true
-  production: false
-  basic:
-    enable: true
-    username: bty
-    password: 123456
+
