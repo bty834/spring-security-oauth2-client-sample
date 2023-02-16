@@ -51,6 +51,7 @@ spring:
             # 校验secret的方式，要和authorization端RegisteredClient配置相同
             # 参见 类ClientAuthenticationMethod
             client-authentication-method: client_secret_basic
+
             # test123
             client-secret: test123
             redirect-uri: http://127.0.0.1:8080/login/oauth2/code/test
@@ -72,5 +73,7 @@ spring:
             jwk-set-uri: http://localhost:9090/oauth2/jwks
             user-info-uri: http://localhost:9090/oauth2/userinfo
             user-name-attribute: sub
-
+            # 拿着accessToken换取userinfo时，accessToken验证方式，默认 header
+            # 参考 类 AuthenticationMethod
+            # user-info-authentication-method:
 
