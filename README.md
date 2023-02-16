@@ -10,3 +10,5 @@ simple use sample of Spring Security OAuth2 Server
 
 - 关于Spring Security中OAuth2.0在前后端分离架构下的授权流程可以参考: [前后端分离：Spring Security OAuth2.0第三方授权](https://blog.csdn.net/weixin_41866717/article/details/127092895)
 
+
+注意：运行client时，请在application.yml中指定profile，样例如application-test.yml中所示
