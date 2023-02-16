@@ -43,11 +43,17 @@ spring:
           test:
             provider: test
             authorization-grant-type: authorization_code
+            #
             scope:
               - profile
+              - openid
             client-id: test
+            # 校验secret的方式，要和authorization端RegisteredClient配置相同
+            # 参见 类ClientAuthenticationMethod
+            client-authentication-method: client_secret_basic
+            # test123
             client-secret: test123
-            redirect-uri: http://localhost:8080/login/oauth2/code/test
+            redirect-uri: http://127.0.0.1:8080/login/oauth2/code/test
         provider:
           # gitee第三方授权文档 https://gitee.com/api/v5/oauth_doc#/
           gitee:
