@@ -120,13 +120,17 @@ public class SerializableToken implements Serializable {
             OAuth2User principal = token.getPrincipal();
             if(principal instanceof OidcUser){
                 serializableToken.setLoginType(LOGIN_TYPE.OIDC);
-                serializableToken.setIdToken(((OidcUser) principal).getIdToken().getClaims());
                 serializableToken.setUserInfo(((OidcUser) principal).getUserInfo().getClaims());
-                serializableToken.setAttributes(principal.getAttributes());
+                // 注意，attributes里面可能存在不可被redis序列化的东西
+//                serializableToken.setAttributes(principal.getAttributes());
+//                serializableToken.setIdToken(((OidcUser) principal).getIdToken().getClaims());
+
+
 
             } else{
                 serializableToken.setLoginType(LOGIN_TYPE.OAUTH2);
-                serializableToken.setAttributes(principal.getAttributes());
+                // 注意，attributes里面可能存在不可被redis序列化的东西
+//                serializableToken.setAttributes(principal.getAttributes());
             }
         }
         return serializableToken;

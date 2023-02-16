@@ -20,6 +20,6 @@ import java.util.stream.Collectors;
 public class CustomGrantedAuthorityMapper implements GrantedAuthoritiesMapper {
     @Override
     public Collection<? extends GrantedAuthority> mapAuthorities(Collection<? extends GrantedAuthority> authorities) {
-        return authorities.stream().map(grantedAuthority -> (GrantedAuthority) () -> "gitee:"+grantedAuthority.getAuthority()).collect(Collectors.toList());
+        return authorities.stream().map(grantedAuthority -> (GrantedAuthority) () -> "CustomGrantedAuthoritiesMapper:"+grantedAuthority.getAuthority()).collect(Collectors.toList());
     }
 }
