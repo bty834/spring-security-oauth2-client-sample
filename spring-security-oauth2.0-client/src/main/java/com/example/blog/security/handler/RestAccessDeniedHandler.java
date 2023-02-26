@@ -23,8 +23,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 /**
  * @author bty
  * @date 2022/9/26
- * @since 1.8
- * 认证已完成，但是访问的接口权限不足，抛出{@link AccessDeniedException}时可能触发该handler
+ * @since 17
+ * <br/>认证已完成，但是访问的接口权限不足，抛出{@link AccessDeniedException}时可能触发该handler
  * 如果未登录且持有匿名用户身份，即使抛出{@link AccessDeniedException}不会触发这个handler，参见 {@link ExceptionTranslationFilter#handleSpringSecurityException(HttpServletRequest, HttpServletResponse, FilterChain, RuntimeException)}
  **/
 @Component

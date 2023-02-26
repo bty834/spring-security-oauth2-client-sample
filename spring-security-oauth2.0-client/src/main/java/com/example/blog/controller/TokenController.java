@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * @author bty
  * @date 2023/2/11
- * @since 1.8
+ * @since 17
  **/
 @RestController
 @RequestMapping("/token")

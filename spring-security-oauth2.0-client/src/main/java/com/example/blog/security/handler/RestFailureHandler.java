@@ -16,7 +16,7 @@ import java.io.IOException;
 /**
  * @author bty
  * @date 2023/2/4
- * @since 1.8
+ * @since 17
  **/
 @Component
 public class RestFailureHandler implements AuthenticationFailureHandler {

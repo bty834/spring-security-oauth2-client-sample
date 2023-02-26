@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * @author bty
  * @date 2023/2/6
- * @since 1.8
+ * @since 17
  **/
 abstract public class BaseRestSuccessHandler implements AuthenticationSuccessHandler {
     private static final Logger logger = LoggerFactory.getLogger(BaseRestSuccessHandler.class);

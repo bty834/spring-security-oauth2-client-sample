@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author bty
  * @date 2022/9/26
- * @since 1.8
+ * @since 17
  **/
 public class JacksonUtil {
 

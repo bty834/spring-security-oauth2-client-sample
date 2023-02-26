@@ -4,7 +4,7 @@ package com.example.blog.security.handler;
 ///**
 // * @author bty
 // * @date 2022/10/3
-// * @since 1.8
+// * @since 17
 // * 第三方Oauth2.0 gitee登录成功时的处理，omit test
 // **/
 ////@Component("oAuth2RestSuccessHandler")

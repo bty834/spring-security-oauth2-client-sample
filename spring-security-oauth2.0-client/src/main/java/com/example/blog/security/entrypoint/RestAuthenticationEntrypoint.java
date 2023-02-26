@@ -26,7 +26,7 @@ import java.io.IOException;
  * 但是前后端分离时不需要重定向。只需传回json，然前端处理即可。
  * @author bty
  * @date 2022/10/3
- * @since 1.8
+ * @since 17
  **/
 @Component
 public class RestAuthenticationEntrypoint implements AuthenticationEntryPoint {

@@ -3,7 +3,7 @@ package com.example.blog.service;
 /**
  * @author bty
  * @date 2022/10/2
- * @since 1.8
+ * @since 17
  **/
 public interface PermissionService {
 

@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * 在后来的 {@link OAuth2LoginAuthenticationFilter} 中会提取 state属性，并根据该state属性从该repository中获取，如果获取不到，表示可能存在CSRF攻击
  * @author bty
  * @date 2023/2/13
- * @since 1.8
+ * @since 17
  **/
 @Component
 @RequiredArgsConstructor

@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * BearerToken相关操作，但 client端未提供，这里直接把 DefaultBearerTokenResolver搬运过来
  * @author bty
  * @date 2023/2/6
- * @since 1.8
+ * @since 17
  **/
 @Component
 public class BearerTokenResolver {

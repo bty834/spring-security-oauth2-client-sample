@@ -6,7 +6,7 @@ import com.example.blog.security.model.SerializableToken;
 /**
  * @author bty
  * @date 2022/10/2
- * @since 1.8
+ * @since 17
  **/
 public interface TokenService<T extends SerializableToken> {
 

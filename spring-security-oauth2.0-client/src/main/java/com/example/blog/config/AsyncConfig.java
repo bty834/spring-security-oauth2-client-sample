@@ -15,7 +15,7 @@ import static org.springframework.aop.interceptor.AsyncExecutionAspectSupport.DE
 /**
  * @author bty
  * @date 2022/10/4
- * @since 1.8
+ * @since 17
  **/
 @Configuration
 @EnableAsync

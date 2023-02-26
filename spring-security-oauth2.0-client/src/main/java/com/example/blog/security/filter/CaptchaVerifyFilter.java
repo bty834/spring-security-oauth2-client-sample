@@ -18,7 +18,7 @@ import java.io.IOException;
 /**
  * @author bty
  * @date 2023/2/11
- * @since 1.8
+ * @since 17
  **/
 @RequiredArgsConstructor
 public class CaptchaVerifyFilter extends OncePerRequestFilter {

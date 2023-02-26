@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * @author bty
  * @date 2023/2/16
- * @since 1.8
+ * @since 17
  **/
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 

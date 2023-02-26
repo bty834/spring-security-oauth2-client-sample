@@ -37,7 +37,7 @@ import java.util.Collections;
 /**
  * @author bty
  * @date 2022/10/2
- * @since 1.8
+ * @since 17
  **/
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)

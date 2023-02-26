@@ -30,7 +30,7 @@ import java.util.UUID;
 /**
  * @author bty
  * @date 2023/2/10
- * @since 1.8
+ * @since 17
  **/
 @Configuration
 public class JwtConfig {

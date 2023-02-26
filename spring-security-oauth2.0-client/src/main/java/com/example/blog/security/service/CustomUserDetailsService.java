@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * 主动修改密码建议使用{@link UserDetailsManager}，该类继承自{@link UserDetailsService}
  * @author bty
  * @date 2022/10/2
- * @since 1.8
+ * @since 17
  **/
 @Component
 @RequiredArgsConstructor

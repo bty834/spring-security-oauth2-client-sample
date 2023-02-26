@@ -29,7 +29,7 @@ import java.io.IOException;
 /**
  * @author bty
  * @date 2023/2/6
- * @since 1.8
+ * @since 17
  **/
 
 public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {

@@ -20,7 +20,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 /**
  * @author bty
  * @date 2023/2/12
- * @since 1.8
+ * @since 17
  **/
 @Component
 public class DefaultLogoutSuccessHandler implements LogoutSuccessHandler {

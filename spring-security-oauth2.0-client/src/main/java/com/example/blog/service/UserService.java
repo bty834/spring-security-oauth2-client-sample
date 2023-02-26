@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 /**
  * @author bty
  * @date 2022/10/2
- * @since 1.8
+ * @since 17
  **/
 public interface UserService {
 

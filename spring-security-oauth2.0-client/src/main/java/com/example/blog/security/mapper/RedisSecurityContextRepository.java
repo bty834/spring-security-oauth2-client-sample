@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  * 该功能由 {@link SessionManagementFilter}完成
  * @author bty
  * @date 2023/2/5
- * @since 1.8
+ * @since 17
  **/
 //@Component
 public class RedisSecurityContextRepository implements SecurityContextRepository {

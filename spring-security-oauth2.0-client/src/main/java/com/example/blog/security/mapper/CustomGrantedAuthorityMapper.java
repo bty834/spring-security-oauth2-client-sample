@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  *
  * @author bty
  * @date 2023/2/5
- * @since 1.8
+ * @since 17
  **/
 @Component
 public class CustomGrantedAuthorityMapper implements GrantedAuthoritiesMapper {

@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * @author bty
  * @date 2023/2/13
- * @since 1.8
+ * @since 17
  **/
 public class SerializableOAuth2AuthorizationRequest implements Serializable {
 
