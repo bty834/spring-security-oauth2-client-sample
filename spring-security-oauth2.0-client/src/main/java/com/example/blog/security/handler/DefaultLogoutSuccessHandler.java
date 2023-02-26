@@ -1,6 +1,7 @@
 package com.example.blog.security.handler;
 
 import com.example.blog.util.JacksonUtil;
+import com.example.blog.util.ServletUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +30,7 @@ public class DefaultLogoutSuccessHandler implements LogoutSuccessHandler {
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         logger.info("logout success");
-        response.setContentType(APPLICATION_JSON_UTF8_VALUE);
-        response.getWriter().write(
-                JacksonUtil.getObjectMapper().writeValueAsString(
-                        ResponseEntity.ok(Collections.singletonMap("msg","logout success!"))
-                )
-        );
+
+        ServletUtil.successResponse(response,Collections.singletonMap("msg","logout success!"));
     }
 }
