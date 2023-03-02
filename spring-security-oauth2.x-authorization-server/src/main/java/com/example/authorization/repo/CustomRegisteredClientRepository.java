@@ -6,12 +6,11 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author bty
  * @date 2023/2/14
- * @since 1.8
+ * @since 17
  **/
 public class CustomRegisteredClientRepository implements RegisteredClientRepository {
 

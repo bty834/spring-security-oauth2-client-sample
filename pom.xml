@@ -15,7 +15,7 @@
         <commons-pool2.version>2.11.0</commons-pool2.version>
         <lombok.version>1.18.24</lombok.version>
         <kapcha.version>2.3.2</kapcha.version>
-        <spring-security-authorization-server.version>0.4.0</spring-security-authorization-server.version>
+        <spring-security-authorization-server.version>0.4.1</spring-security-authorization-server.version>
     </properties>
 
     <packaging>pom</packaging>

@@ -9,7 +9,7 @@ import java.util.Base64;
 /**
  * @author bty
  * @date 2023/2/14
- * @since 1.8
+ * @since 17
  **/
 @Component
 public class CustomPasswordEncoder extends BCryptPasswordEncoder {

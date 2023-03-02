@@ -43,7 +43,7 @@ import java.util.function.Function;
 /**
  * @author bty
  * @date 2023/2/14
- * @since 1.8
+ * @since 17
  **/
 @Configuration
 public class SecurityConfig {
@@ -89,14 +89,13 @@ public class SecurityConfig {
 
         RequestMatcher endpointsMatcher = conf.getEndpointsMatcher();
 
-        http.securityMatcher(endpointsMatcher)
-                .authorizeHttpRequests()
-                .anyRequest().authenticated()
-                .and()
-                .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher));
-
-
         http
+                .requestMatcher(endpointsMatcher)
+                .authorizeRequests(authorizeRequests ->
+                        authorizeRequests.anyRequest().authenticated()
+                )
+                .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
+
                 // Redirect to the login page when not authenticated from the
                 // authorization endpoint
                 .exceptionHandling((exceptions) -> exceptions
