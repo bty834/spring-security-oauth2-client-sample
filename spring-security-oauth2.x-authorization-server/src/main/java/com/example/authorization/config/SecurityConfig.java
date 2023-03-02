@@ -48,6 +48,7 @@ import java.util.function.Function;
 @Configuration
 public class SecurityConfig {
 
+
     private final Function<OidcUserInfoAuthenticationContext, OidcUserInfo> oidcUserMapper;
 
     public SecurityConfig(Function<OidcUserInfoAuthenticationContext, OidcUserInfo> oidcUserMapper) {
