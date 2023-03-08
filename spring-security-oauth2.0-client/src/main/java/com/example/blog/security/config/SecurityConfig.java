@@ -7,6 +7,8 @@ import com.example.blog.security.service.CustomOAuth2UserService;
 import com.example.blog.service.CaptchaService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +17,17 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -28,6 +38,7 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.context.NullSecurityContextRepository;
+import org.springframework.web.client.RestOperations;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -94,9 +105,13 @@ public class SecurityConfig {
 
     private final AuthorizationRequestRepository authorizationRequestRepository;
 
-
     private final LogoutSuccessHandler logoutSuccessHandler;
     private final LogoutHandler logoutHandler;
+
+    private final OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> customAccessTokenResponseClient;
+
+    private final OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService;
+    private final OAuth2UserService<OidcUserRequest, OidcUser> customOidcUserService;
 
 
     @Value("${captcha.enabled}")
@@ -209,15 +224,14 @@ public class SecurityConfig {
                 .and()
                 // 后端接受code的地址，拿到code去换accessToken和userInfo，默认 /login/oauth2/code/* 星号不能省略，使用AntMatch，参见 AbstractAuthenticationProcessingFilter#setFilterProcessesUrl
                 .redirectionEndpoint().baseUri("/login/oauth2/code/*")
-//                .and()
-//                .tokenEndpoint().accessTokenResponseClient() //
                 .and()
-
+                .tokenEndpoint().accessTokenResponseClient(customAccessTokenResponseClient) //
+                .and()
                 .userInfoEndpoint()
                 // 重写普通OAuth2的OAuth2UserService, 默认DefaultOAuth2UserService
-                .userService(new CustomOAuth2UserService())
+                .userService(customOAuth2UserService)
                 // 设置Oidc的OAuth2UserService, OidcUserService中组合了DefaultOAuth2UserService
-                .oidcUserService(new OidcUserService())
+                .oidcUserService(customOidcUserService)
 //                // 针对认证成功的用户，调用OAuth2AuthorizedClientRepository的
 //                // 默认实现类AuthenticatedPrincipalOAuth2AuthorizedClientRepository中的
 //                // OAuth2AuthorizedClientService (默认Inmemory)存储
@@ -226,6 +240,7 @@ public class SecurityConfig {
 //                .authorizedClientRepository(...)
                 .and()
                 .authorizedClientService(daoOAuth2AuthorizedClientService);
+
 
         http.logout()
                 .logoutUrl(logoutUri)
@@ -239,7 +254,7 @@ public class SecurityConfig {
                 new BearerTokenAuthenticationFilter(restAuthenticationEntrypoint, bearerTokenResolver, jwtAuthenticationManager, restFailureHandler),
 //                OAuth2AuthorizationRequestRedirectFilter.class
                 OAuth2AuthorizationRequestRedirectFilter.class
-                );
+        );
 
 
         CaptchaVerifyFilter captchaVerifyFilter = new CaptchaVerifyFilter(loginUri, captchaService, restFailureHandler);
