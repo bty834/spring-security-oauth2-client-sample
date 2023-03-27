@@ -1,4 +1,4 @@
-simple use sample of Spring Security OAuth2 Server
+Simple usage of Spring Security OAuth2 Rest Client & Authorization Server
 
 - Authorization Server: support both OAuth2.0 and OAuth2.1 ,including Resource Server
 - Rest Client
